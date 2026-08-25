@@ -59,18 +59,15 @@ A orquestração dos dados é feita no back-end consumindo os seguintes serviço
 
 ```text
 PlanetOverview/
-├── backend/
-│   ├── Controllers/
-│   ├── Services/
-│   ├── Models/
-│   ├── appsettings.json
-│   └── Program.cs
-├── frontend/
-│   ├── assets/
-│   │   ├── css/
-│   │   ├── js/
-│   │   └── img/
-│   └── index.html
-├── docs/
-│   └── Relatorio_de_Viabilidade_PlanetOverview.pdf
+│── bin/
+│── Controllers/
+│── Models/
+│── obj
+│── Properties
+│── Views
+├── wwroot
+├── appsettings.Development.json
+├── appsettings.json
+├── PlanetOverview.csproj
+├── Program.cs
 └── README.md
