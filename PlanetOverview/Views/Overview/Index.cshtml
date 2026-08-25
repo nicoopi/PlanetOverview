@@ -1,0 +1,140 @@
+@model PlanetOverview.Models.CountryOverviewViewModel
+@{
+    Layout = null; // Removemos o menu padrão do .NET para focar no seu design
+}
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planet Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800">
+
+    <!-- Navegação -->
+    <nav class="bg-[#001f3f] text-white p-4 flex justify-between items-center px-10">
+        <div class="flex items-center gap-2 text-xl font-bold">
+            <i class="fas fa-globe"></i> Planet Overview
+        </div>
+        <div class="gap-6 text-sm hidden md:flex">
+            <a href="#" class="border-b-2 border-white pb-1">Início</a>
+            <a href="#" class="text-slate-300 hover:text-white">Como funciona</a>
+        </div>
+    </nav>
+
+    <!-- Cabeçalho / Busca -->
+    <header class="max-w-5xl mx-auto mt-12 px-6 flex flex-col md:flex-row items-center justify-between">
+        <div class="w-full md:w-1/2">
+            <h1 class="text-4xl font-extrabold text-[#001f3f] mb-2">Descubra o mundo em um só lugar</h1>
+            <p class="text-slate-500 mb-6">Pesquise qualquer país e veja informações atualizadas em uma única tela.</p>
+            
+            <div class="flex w-full shadow-sm rounded-lg overflow-hidden border border-slate-200 bg-white">
+                <div class="p-3 text-slate-400 bg-white flex items-center justify-center">
+                    <i class="fas fa-search"></i>
+                </div>
+                <input type="text" placeholder="Digite ou selecione um país..." class="w-full p-3 outline-none text-slate-700">
+                <button class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 transition-colors">Buscar país</button>
+            </div>
+            
+            <div class="mt-4 flex items-center text-xs text-slate-500 bg-green-50 w-fit px-3 py-1 rounded-full border border-green-100">
+                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div> Dados em tempo real
+            </div>
+        </div>
+    </header>
+
+    <!-- Card de Visão Geral (Usando os dados do C#!) -->
+    <main class="max-w-5xl mx-auto mt-12 px-6 mb-20">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8">
+            
+            <!-- Título do Card -->
+            <div class="flex justify-between items-center mb-8 border-b border-slate-100 pb-4">
+                <div class="flex items-center gap-4">
+                    <img src="https://flagcdn.com/w80/br.png" alt="Bandeira" class="w-12 h-8 rounded shadow-sm border border-slate-100">
+                    <h2 class="text-2xl font-bold text-[#001f3f]">Visão geral do Brasil</h2>
+                </div>
+                <div class="text-sm text-slate-400 flex items-center gap-2">
+                    <i class="fas fa-sync-alt"></i> Atualizado agora
+                </div>
+            </div>
+
+            <!-- Grid de Informações -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                
+                <!-- Capital -->
+                <div class="col-span-1 lg:col-span-2 bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="fas fa-landmark text-3xl text-slate-400"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Capital:</p>
+                        <p class="text-xl font-bold">Brasília</p>
+                    </div>
+                </div>
+
+                <!-- Idioma -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="far fa-comment-dots text-3xl text-blue-500"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Idioma</p>
+                        <p class="font-bold">Português</p>
+                    </div>
+                </div>
+
+                <!-- População -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="fas fa-users text-3xl text-slate-400"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">População</p>
+                        <p class="font-bold">203 milhões</p>
+                    </div>
+                </div>
+
+                <!-- Clima -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="fas fa-cloud-sun text-3xl text-slate-400"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Clima agora</p>
+                        <p class="text-xl font-bold">24°C</p>
+                    </div>
+                </div>
+
+                <!-- Horário -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="far fa-clock text-3xl text-blue-500"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Horário local</p>
+                        <p class="text-xl font-bold">18:42</p>
+                    </div>
+                </div>
+
+                <!-- Conversor -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="fas fa-exchange-alt text-3xl text-green-500"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Conversor de moeda</p>
+                        <p class="font-bold">BRL -&gt; USD</p>
+                    </div>
+                </div>
+
+                <!-- Notícia -->
+                <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
+                    <i class="far fa-newspaper text-3xl text-slate-400"></i>
+                    <div>
+                        <p class="text-sm text-slate-500">Notícia em destaque</p>
+                        <a href="#" class="font-bold text-blue-600 hover:underline">Ver notícia &gt;</a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- Rodapé -->
+    <footer class="bg-[#001f3f] text-center text-slate-400 py-6 text-sm">
+        <i class="fas fa-globe mr-2"></i> Planet Overview — explore, compare e planeje
+    </footer>
+
+
+</body>
+</html>
