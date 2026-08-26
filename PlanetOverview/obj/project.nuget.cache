@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "wX211pCiZ/AB/uVa4a74rfmX9TNfIsOzujTQ87QSpAO4JS4yDmdaKWhfkT8piBY7LHTu+AKHnOrQhIm/jxK2yg==",
+  "dgSpecHash": "6FW9QLdPaXg=",
   "success": true,
-  "projectFilePath": "C:\\Users\\ALEXANDRESTRECHARDON\\Documents\\RepositorioLocal\\PlanetOverview\\PlanetOverview\\PlanetOverview.csproj",
-  "expectedPackageFiles": [],
+  "projectFilePath": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
+  "expectedPackageFiles": [
+    "/home/luiz/.nuget/packages/microsoft.netcore.app.ref/8.0.29/microsoft.netcore.app.ref.8.0.29.nupkg.sha512",
+    "/home/luiz/.nuget/packages/microsoft.aspnetcore.app.ref/8.0.29/microsoft.aspnetcore.app.ref.8.0.29.nupkg.sha512",
+    "/home/luiz/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.29/microsoft.netcore.app.host.linux-x64.8.0.29.nupkg.sha512"
+  ],
   "logs": []
 }

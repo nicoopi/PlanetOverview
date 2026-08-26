@@ -8,24 +8,25 @@
     "net8.0": []
   },
   "packageFolders": {
-    "C:\\Users\\ALEXANDRESTRECHARDON\\.nuget\\packages\\": {}
+    "/home/luiz/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\ALEXANDRESTRECHARDON\\Documents\\RepositorioLocal\\PlanetOverview\\PlanetOverview\\PlanetOverview.csproj",
+      "projectUniqueName": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
       "projectName": "PlanetOverview",
-      "projectPath": "C:\\Users\\ALEXANDRESTRECHARDON\\Documents\\RepositorioLocal\\PlanetOverview\\PlanetOverview\\PlanetOverview.csproj",
-      "packagesPath": "C:\\Users\\ALEXANDRESTRECHARDON\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\ALEXANDRESTRECHARDON\\Documents\\RepositorioLocal\\PlanetOverview\\PlanetOverview\\obj\\",
+      "projectPath": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
+      "packagesPath": "/home/luiz/.nuget/packages/",
+      "outputPath": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "C:\\Users\\ALEXANDRESTRECHARDON\\AppData\\Roaming\\NuGet\\NuGet.Config"
+        "/home/luiz/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
+        "/usr/lib64/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -43,7 +44,8 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      }
+      },
+      "SdkAnalysisLevel": "10.0.100"
     },
     "frameworks": {
       "net8.0": {
@@ -59,6 +61,20 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
+        "downloadDependencies": [
+          {
+            "name": "Microsoft.AspNetCore.App.Ref",
+            "version": "[8.0.29, 8.0.29]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Host.linux-x64",
+            "version": "[8.0.29, 8.0.29]"
+          },
+          {
+            "name": "Microsoft.NETCore.App.Ref",
+            "version": "[8.0.29, 8.0.29]"
+          }
+        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -67,7 +83,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.206/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
