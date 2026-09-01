@@ -9,4 +9,6 @@ public class CountryOverview
     public required string CountryCode { get; set; }
 
     public long Population { get; set; }
+
+    public WeatherOverview? Weather { get; set;}
 }
