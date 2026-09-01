@@ -8,25 +8,24 @@
     "net8.0": []
   },
   "packageFolders": {
-    "/home/luiz/.nuget/packages/": {}
+    "/Users/nickk/.nuget/packages/": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
+      "projectUniqueName": "/Users/nickk/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
       "projectName": "PlanetOverview",
-      "projectPath": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
-      "packagesPath": "/home/luiz/.nuget/packages/",
-      "outputPath": "/home/luiz/Downloads/PlanetOverview/PlanetOverview/obj/",
+      "projectPath": "/Users/nickk/PlanetOverview/PlanetOverview/PlanetOverview.csproj",
+      "packagesPath": "/Users/nickk/.nuget/packages/",
+      "outputPath": "/Users/nickk/PlanetOverview/PlanetOverview/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
-        "/home/luiz/.nuget/NuGet/NuGet.Config"
+        "/Users/nickk/.nuget/NuGet/NuGet.Config"
       ],
       "originalTargetFrameworks": [
         "net8.0"
       ],
       "sources": {
-        "/usr/lib64/dotnet/library-packs": {},
         "https://api.nuget.org/v3/index.json": {}
       },
       "frameworks": {
@@ -44,8 +43,7 @@
         "enableAudit": "true",
         "auditLevel": "low",
         "auditMode": "direct"
-      },
-      "SdkAnalysisLevel": "10.0.100"
+      }
     },
     "frameworks": {
       "net8.0": {
@@ -61,20 +59,6 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "downloadDependencies": [
-          {
-            "name": "Microsoft.AspNetCore.App.Ref",
-            "version": "[8.0.29, 8.0.29]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Host.linux-x64",
-            "version": "[8.0.29, 8.0.29]"
-          },
-          {
-            "name": "Microsoft.NETCore.App.Ref",
-            "version": "[8.0.29, 8.0.29]"
-          }
-        ],
         "frameworkReferences": {
           "Microsoft.AspNetCore.App": {
             "privateAssets": "none"
@@ -83,7 +67,7 @@
             "privateAssets": "all"
           }
         },
-        "runtimeIdentifierGraphPath": "/usr/lib64/dotnet/sdk/10.0.110/PortableRuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/8.0.424/PortableRuntimeIdentifierGraph.json"
       }
     }
   }
