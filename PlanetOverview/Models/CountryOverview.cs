@@ -6,7 +6,7 @@ public class CountryOverview
     public string? Capital { get; set; }
     public string? CountryCode { get; set; }
     public long Population { get; set; } 
-
+    public WeatherOverview? Weather { get; set; }
     public string? CountryName { get; set; }
     public string? FlagUrl { get; set; }
     public string? Language { get; set; }
