@@ -1,42 +1,29 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using PlanetOverview.Services.Interfaces;
 
-namespace PlanetOverview.Controllers
+namespace PlanetOverview.Controllers;
+
+[ApiController]
+[Route("api/[controller]")]
+public class NewsController : ControllerBase
 {
-    [ApiController]
-    [Route("api/[controller]")] 
-    public class NewsController : ControllerBase
+    private readonly INewsService _newsService;
+
+    public NewsController(INewsService newsService)
     {
-                private readonly IConfiguration _config;
-        public NewsController(IConfiguration config)
+        _newsService = newsService;
+    }
+
+    [HttpGet("{pais}")]
+    public async Task<IActionResult> ObterNoticias(string pais)
+    {
+        var result = await _newsService.GetNewsAsync(pais);
+
+        if (result == null || result.Articles == null || result.Articles.Count == 0)
         {
-            _config = config;
+            return NotFound("Nenhuma notícia encontrada ou falha na comunicação com o serviço.");
         }
 
-        [HttpGet("{pais}")]
-        public async Task<IActionResult> ObterNoticias(string pais)
-        {
-            string? chaveApi = _config["ApiConfigs:NewsApiKey"];
-
-            string urlRequisicao = $"https://newsapi.org/v2/everything?q={pais}&apiKey={chaveApi}";
-
-            using (HttpClient clienteHttp = new HttpClient())
-            {
-                clienteHttp.DefaultRequestHeaders.Add("User-Agent", "PlanetOverview-App");
-
-                HttpResponseMessage resposta = await clienteHttp.GetAsync(urlRequisicao);
-
-                if (resposta.IsSuccessStatusCode)
-                {
-                    string corpoJson = await resposta.Content.ReadAsStringAsync();
-
-                    return Content(corpoJson, "application/json");
-                }
-                else
-                {
-                    return StatusCode((int)resposta.StatusCode, "Falha na comunicação com o serviço de notícias.");
-                }
-            }
-        }
+        return Ok(result);
     }
 }
