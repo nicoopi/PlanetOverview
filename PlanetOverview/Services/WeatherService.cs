@@ -8,15 +8,18 @@ namespace PlanetOverview.Services;
 public class WeatherService : IWeatherService
 {
     private readonly HttpClient _httpClient;
+    private readonly IConfiguration _config;
 
-    public WeatherService(HttpClient httpClient)
+    public WeatherService(HttpClient httpClient, IConfiguration config)
     {
         _httpClient = httpClient;
+        _config = config;
     }
     public async Task<WeatherOverview?> GetWeather(string capital)
     {   
+        var chaveApi = _config["ApiConfigs:WeatherApiKey"];
         var response = await _httpClient.GetFromJsonAsync<WeatherApiResponse>(
-            $"https://api.openweathermap.org/data/2.5/weather?q={capital}&appid=COLOCAR_CHAVE_AQUI&units=metric&lang=pt_br"
+            $"https://api.openweathermap.org/data/2.5/weather?q={capital}&appid={chaveApi}&units=metric&lang=pt_br"
         );
 
         if (response == null)
