@@ -8,13 +8,12 @@ namespace PlanetOverview.Services;
 public class CountryService : ICountryService
 {
     private readonly HttpClient _httpClient;
-    private readonly IWeatherService _weatherService;
 
-    public CountryService(HttpClient httpClient, IWeatherService weatherService)
+    public CountryService(HttpClient httpClient)
     {
         _httpClient = httpClient;
-        _weatherService = weatherService;
     }
+    
     public async Task<CountryOverview?> GetCountry(string country)
     {
         var response = await _httpClient.GetFromJsonAsync<CountryApiResponse[]>(
@@ -33,15 +32,12 @@ public class CountryService : ICountryService
             return null;
         }
 
-        var dadosClima = await _weatherService.GetWeather(apiCountry.Capital[0]);
-
         var countryOverview = new CountryOverview
         {
             Country = apiCountry.Name.Common,
             Capital = apiCountry.Capital[0],
             CountryCode = apiCountry.Cca2,
-            Population = apiCountry.Population,
-            Weather = dadosClima,
+            Population = apiCountry.Population
         };
 
         return countryOverview;

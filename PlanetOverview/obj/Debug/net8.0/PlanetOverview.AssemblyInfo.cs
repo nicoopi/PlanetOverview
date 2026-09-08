@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PlanetOverview")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+e17e7eff31dcd8db30dad9859d84ed65322e713c")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f727695414c73dfbeec0d8f872e48e5b0a2a837c")]
 [assembly: System.Reflection.AssemblyProductAttribute("PlanetOverview")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PlanetOverview")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
