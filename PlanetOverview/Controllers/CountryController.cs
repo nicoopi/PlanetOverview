@@ -17,11 +17,18 @@ public class CountryController : ControllerBase
     [HttpGet("{country}")]
     public async Task<IActionResult> GetCountry(string country)
     {
+        if (string.IsNullOrWhiteSpace(country))
+        {
+            return BadRequest("O país é obrigatório.");
+        }
+
         var result = await _countryService.GetCountry(country);
 
         if (result == null)
         {
-            return NotFound();
+            return NotFound(
+                $"Não foi possível encontrar o país '{country}'."
+            );
         }
 
         return Ok(result);

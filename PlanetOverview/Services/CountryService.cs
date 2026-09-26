@@ -1,3 +1,4 @@
+using System.Net;
 using System.Net.Http.Json;
 using PlanetOverview.Models;
 using PlanetOverview.Models.ApiResponses;
@@ -13,33 +14,68 @@ public class CountryService : ICountryService
     {
         _httpClient = httpClient;
     }
-    
+
     public async Task<CountryOverview?> GetCountry(string country)
     {
-        var response = await _httpClient.GetFromJsonAsync<CountryApiResponse[]>(
-            $"https://restcountries.com/v3.1/name/{country}"
+        if (string.IsNullOrWhiteSpace(country))
+        {
+            return null;
+        }
+
+        var encodedCountry = Uri.EscapeDataString(country.Trim());
+
+        var response = await _httpClient.GetAsync(
+            $"https://restcountries.com/v3.1/name/{encodedCountry}"
         );
 
-        if (response == null || response.Length == 0)
+        if (response.StatusCode == HttpStatusCode.NotFound)
         {
             return null;
         }
 
-        var apiCountry = response[0];
-
-        if (apiCountry.Capital == null || apiCountry.Capital.Length == 0)
+        if (!response.IsSuccessStatusCode)
         {
             return null;
         }
 
-        var countryOverview = new CountryOverview
+        var countries = await response.Content
+            .ReadFromJsonAsync<CountryApiResponse[]>();
+
+        if (countries == null || countries.Length == 0)
+        {
+            return null;
+        }
+
+        var apiCountry = countries.FirstOrDefault(
+            c => c.Name?.Common != null &&
+                 c.Name.Common.Equals(
+                     country.Trim(),
+                     StringComparison.OrdinalIgnoreCase
+                 )
+        ) ?? countries[0];
+
+        if (apiCountry.Name?.Common == null ||
+            string.IsNullOrWhiteSpace(apiCountry.Cca2))
+        {
+            return null;
+        }
+
+        var language = apiCountry.Languages != null
+            ? string.Join(", ", apiCountry.Languages.Values)
+            : null;
+
+        var capital = apiCountry.Capital?.FirstOrDefault();
+
+        return new CountryOverview
         {
             Country = apiCountry.Name.Common,
-            Capital = apiCountry.Capital[0],
+            CountryName = apiCountry.Name.Official,
+            Capital = capital,
             CountryCode = apiCountry.Cca2,
-            Population = apiCountry.Population
+            Population = apiCountry.Population,
+            FlagUrl = apiCountry.Flags?.Svg ?? apiCountry.Flags?.Png,
+            Language = language,
+            TimeZones = apiCountry.Timezones?.ToList() ?? []
         };
-
-        return countryOverview;
     }
 }

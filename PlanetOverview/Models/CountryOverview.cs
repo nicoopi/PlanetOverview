@@ -13,6 +13,8 @@ public class CountryOverview
     public string? Temperature { get; set; }
     public string? LocalTime { get; set; }
     public string? CurrencyConversion { get; set; }
+
+    public List<string> TimeZones { get; set; } = new();
 }
 
 public class CountryOverviewViewModel : CountryOverview
