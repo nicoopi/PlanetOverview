@@ -97,6 +97,7 @@ O navegador acessa somente endpoints `/api` da própria aplicação para os dado
 
 | Endpoint | Uso |
 | --- | --- |
+| `/api/country` | Lista de 250 países/territórios para sugestões na busca, com nomes em português e inglês e código ISO |
 | `/api/country/{pais}` | Nome em português/inglês, capital, idioma, população, moeda e coordenadas |
 | `/api/weather/{capital},{codigoPais}` | Clima da capital em °C |
 | `/api/time/coordinates?latitude=...&longitude=...` | Horário e fuso IANA da capital |
@@ -108,6 +109,16 @@ O conversor multiplica o valor em USD pela taxa carregada, sem uma nova chamada
 por digitação. Países com vários fusos usam o horário da capital. As consultas
 complementares são paralelas, têm timeout e falham independentemente; uma nova
 busca cancela a anterior no navegador para impedir resultados misturados.
+
+O campo de país mostra até oito sugestões enquanto o usuário digita, ignorando
+acentos e aceitando nomes em português, inglês ou códigos ISO. O catálogo é
+carregado uma vez por página, sem consultar serviços externos a cada tecla.
+Selecione por clique ou pelas setas e Enter para buscar; Escape e Tab fecham a
+lista. A busca manual continua disponível se o catálogo não puder ser carregado.
+
+O resumo do país exibe apenas os seis cards de dados gerais, clima, horário e
+conversão. As notícias ficam na seção inferior, com uma reportagem principal,
+uma segunda manchete e os demais cards em uma lista compacta e responsiva.
 
 As notícias usam os nomes canônicos do país em português e inglês como frases
 exatas, com busca restrita ao título, validação adicional de correspondência e

@@ -5,6 +5,15 @@ namespace PlanetOverview.Services;
 public class CountryService : ICountryService
 {
     private static readonly CountryApiResponse[] Countries = LoadCountries();
+    private static readonly CountrySuggestion[] Suggestions = Countries
+        .Where(country => country.Name?.Common != null && country.Cca2 != null)
+        .Select(country => new CountrySuggestion(
+            country.Translations?.GetValueOrDefault("por")?.Common ?? country.Name!.Common!,
+            country.Name!.Common!, country.Cca2!))
+        .OrderBy(country => country.Name, StringComparer.Create(new System.Globalization.CultureInfo("pt-BR"), false))
+        .ToArray();
+
+    public IReadOnlyList<CountrySuggestion> GetCountries() => Suggestions;
 
     private static CountryApiResponse[] LoadCountries()
     {

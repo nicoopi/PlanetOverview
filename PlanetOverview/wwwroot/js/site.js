@@ -8,6 +8,114 @@
     let exchangeRate;
     let currency;
     let clock;
+    const countryInput = byId('country-input');
+    const options = byId('country-options');
+    let countriesPromise;
+    let matches = [];
+    let activeOption = -1;
+    let suggestionVersion = 0;
+
+    const normalizeCountry = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
+
+    function closeSuggestions() {
+        suggestionVersion++;
+        options.hidden = true;
+        countryInput.setAttribute('aria-expanded', 'false');
+        countryInput.removeAttribute('aria-activedescendant');
+        activeOption = -1;
+        text('country-suggestion-status', '');
+    }
+
+    function activateOption(index) {
+        activeOption = index;
+        for (const [position, option] of Array.from(options.children).entries())
+            option.setAttribute('aria-selected', String(position === index));
+        if (index >= 0) {
+            countryInput.setAttribute('aria-activedescendant', `country-option-${index}`);
+            options.children[index]?.scrollIntoView({ block: 'nearest' });
+        } else countryInput.removeAttribute('aria-activedescendant');
+    }
+
+    function selectCountry(index) {
+        const selected = matches[index];
+        if (!selected) return;
+        countryInput.value = selected.name;
+        closeSuggestions();
+        form.requestSubmit();
+    }
+
+    async function suggestCountries() {
+        const version = ++suggestionVersion;
+        const query = normalizeCountry(countryInput.value.trim());
+        if (!query) { closeSuggestions(); return; }
+        try {
+            countriesPromise ??= api('/api/country').catch(error => { countriesPromise = undefined; throw error; });
+            const countries = await countriesPromise;
+            if (version !== suggestionVersion || document.activeElement !== countryInput) return;
+            const rank = country => normalizeCountry(country.name).startsWith(query) ? 0
+                : normalizeCountry(country.englishName).startsWith(query) ? 1 : 2;
+            matches = countries.filter(country => [country.name, country.englishName, country.countryCode]
+                .some(value => normalizeCountry(value).includes(query)))
+                .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name, 'pt-BR'))
+                .slice(0, 8);
+            options.replaceChildren();
+            activeOption = -1;
+            countryInput.removeAttribute('aria-activedescendant');
+            if (!matches.length) {
+                const empty = document.createElement('div');
+                empty.className = 'country-no-results';
+                empty.textContent = 'Nenhum país encontrado. Confira o nome digitado.';
+                empty.setAttribute('role', 'presentation');
+                options.append(empty);
+            }
+            matches.forEach((country, index) => {
+                const option = document.createElement('div');
+                option.id = `country-option-${index}`;
+                option.className = 'country-option';
+                option.setAttribute('role', 'option');
+                option.setAttribute('aria-selected', 'false');
+                option.dataset.index = String(index);
+                const code = document.createElement('span');
+                code.className = 'country-code';
+                code.textContent = country.countryCode;
+                const label = document.createElement('span');
+                const name = document.createElement('strong');
+                name.textContent = country.name;
+                const english = document.createElement('small');
+                english.textContent = country.englishName;
+                label.append(name, english);
+                option.append(code, label);
+                options.append(option);
+            });
+            options.hidden = false;
+            countryInput.setAttribute('aria-expanded', 'true');
+            text('country-suggestion-status', matches.length ? `${matches.length} sugestões. Use as setas e Enter para selecionar.` : 'Nenhum país encontrado.');
+        } catch {
+            if (version === suggestionVersion) closeSuggestions(); // Manual search remains available.
+        }
+    }
+
+    countryInput.addEventListener('input', suggestCountries);
+    countryInput.addEventListener('focus', suggestCountries);
+    countryInput.addEventListener('blur', closeSuggestions);
+    options.addEventListener('pointerdown', event => event.preventDefault());
+    options.addEventListener('click', event => {
+        const option = event.target.closest('[role="option"]');
+        if (option) selectCountry(Number(option.dataset.index));
+    });
+    countryInput.addEventListener('keydown', event => {
+        if (event.key === 'Escape' || event.key === 'Tab') { closeSuggestions(); return; }
+        if (options.hidden || !matches.length) return;
+        if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+            event.preventDefault();
+            const next = event.key === 'ArrowDown' ? (activeOption + 1) % matches.length
+                : (activeOption <= 0 ? matches.length - 1 : activeOption - 1);
+            activateOption(next);
+        } else if (event.key === 'Enter' && activeOption >= 0) {
+            event.preventDefault();
+            selectCountry(activeOption);
+        }
+    });
 
     async function api(path, signal) {
         const response = await fetch(path, { signal, headers: { Accept: 'application/json' } });
@@ -141,7 +249,6 @@
             container.append(card);
         }
         const count = container.childElementCount;
-        text('news-status', count ? `${count} notícias sobre ${countryName}` : 'Nenhuma notícia recente');
         byId('country-news').setAttribute('aria-busy', 'false');
         if (count) {
             text('news-count', `${count} ${count === 1 ? 'reportagem' : 'reportagens'}`);
@@ -155,6 +262,7 @@
         event?.preventDefault();
         const query = byId('country-input').value.trim();
         if (!query) return;
+        closeSuggestions();
         currentRequest?.abort();
         currentRequest = new AbortController();
         const signal = currentRequest.signal;
@@ -165,7 +273,7 @@
         text('news-heading', 'Notícias do país');
         text('news-context', 'Consultando as manchetes do país pesquisado…');
         byId('country-flag').hidden = true;
-        for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate', 'news-status']) text(id, 'Carregando…');
+        for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate']) text(id, 'Carregando…');
         for (const id of ['weather-description', 'time-zone', 'currency-result']) text(id, '');
         text('country-source', '');
         text('country-title', `Buscando ${query}`);
@@ -229,7 +337,6 @@
                     const news = await api(`/api/news/${encodeURIComponent(country.countryCode)}`, signal);
                     if (!signal.aborted) renderNews(news);
                 }, () => {
-                    text('news-status', 'Notícias indisponíveis');
                     text('news-context', 'Não foi possível atualizar as manchetes desta consulta.');
                     newsMessage('As notícias estão indisponíveis', 'Tente buscar o país novamente em alguns instantes.');
                 })
@@ -245,7 +352,7 @@
             text('news-context', 'As manchetes acompanham o país que você pesquisar.');
             newsMessage('Escolha um país para explorar', 'Confira o nome digitado e faça uma nova busca.');
             text('updated-at', 'Consulta não concluída');
-            for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate', 'news-status']) text(id, '—');
+            for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate']) text(id, '—');
         } finally {
             if (!signal.aborted) {
                 byId('overview').setAttribute('aria-busy', 'false');
