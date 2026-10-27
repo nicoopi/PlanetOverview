@@ -87,7 +87,8 @@ Se `appsettings.Development.json` já estiver configurado, execute somente
 
 As chaves ficam somente no servidor; `appsettings.Development.json` é ignorado
 pelo Git. Em produção, use as variáveis `ApiConfigs__NewsApiKey`,
-`ApiConfigs__WeatherApiKey` e `ApiConfigs__CurrencyApiKey`. Não coloque chaves
+`ApiConfigs__WeatherApiKey`, `ApiConfigs__CurrencyApiKey` e
+`ApiConfigs__CountriesApiKey`. Não coloque chaves
 no JavaScript, nas views ou em arquivos publicados em `wwwroot`.
 
 ### Integração da tela
@@ -133,9 +134,16 @@ falhas do provedor retornam HTTP 503, mantendo os demais cards disponíveis.
 ### Dados gerais e disponibilidade
 
 O REST Countries desativou a API `/v3.1` usada na versão original do projeto.
-A busca agora usa uma referência local com 250 países/territórios, incorporada
-na compilação e identificada na tela. Esses dados gerais, especialmente população,
-não são em tempo real. Veja a origem, revisão e licença em
+A busca e o autocomplete resolvem os nomes usando uma referência local com 250
+países/territórios. Quando `ApiConfigs:CountriesApiKey` está preenchida, o servidor
+consulta `https://api.restcountries.com/countries/v5/codes.alpha_2/{ISO}` com
+autenticação Bearer e usa os dados retornados pela API v5. As respostas ficam em
+cache por quatro horas para poupar a cota, inclusive nas consultas de notícias.
+A fonte aparece como `REST Countries API v5` na tela. Sem chave ou durante uma
+falha do provedor, a aplicação usa a referência local e identifica essa fonte;
+falhas são armazenadas por um minuto antes de permitir nova consulta.
+Os dados da base local, especialmente população, não são em tempo real.
+Veja a origem, revisão e licença em
 [PlanetOverview/Data/README.md](PlanetOverview/Data/README.md).
 
 Clima, câmbio, notícias e horário usam os serviços online. A disponibilidade e a
