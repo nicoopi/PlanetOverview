@@ -102,12 +102,19 @@ O navegador acessa somente endpoints `/api` da própria aplicação para os dado
 | `/api/time/coordinates?latitude=...&longitude=...` | Horário e fuso IANA da capital |
 | `/api/time?timeZone=America/Sao_Paulo` | Consulta direta por fuso IANA |
 | `/api/currency/{moeda}` | Taxa de 1 USD para a moeda local |
-| `/api/news/{pais}` | Até seis notícias relacionadas ao país |
+| `/api/news/{pais}` | Até seis notícias em português com o nome do país no título; aceita também o código ISO (BR, JP, PT) |
 
 O conversor multiplica o valor em USD pela taxa carregada, sem uma nova chamada
 por digitação. Países com vários fusos usam o horário da capital. As consultas
 complementares são paralelas, têm timeout e falham independentemente; uma nova
 busca cancela a anterior no navegador para impedir resultados misturados.
+
+As notícias usam os nomes canônicos do país em português e inglês como frases
+exatas, com busca restrita ao título, validação adicional de correspondência e
+remoção de URLs repetidas. A seção identifica o país selecionado e exibe imagem,
+fonte, data e link da reportagem. Imagens indisponíveis recebem uma ilustração
+neutra. Sem manchetes, a API retorna uma lista vazia e a tela informa esse estado;
+falhas do provedor retornam HTTP 503, mantendo os demais cards disponíveis.
 
 ### Dados gerais e disponibilidade
 

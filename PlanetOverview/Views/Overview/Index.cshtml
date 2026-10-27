@@ -10,6 +10,7 @@
     <title>Planet Overview</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/news.css" asp-append-version="true">
 </head>
 <body class="bg-slate-50 font-sans text-slate-800">
 
@@ -132,9 +133,16 @@
 
             </div>
         </div>
-        <section class="mt-8" aria-labelledby="news-heading">
-            <h2 id="news-heading" class="text-xl font-bold mb-4">Notícias recentes</h2>
-            <div id="news-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        <section id="country-news" class="news-section" aria-labelledby="news-heading" aria-busy="false">
+            <div class="news-section-heading">
+                <div>
+                    <p class="news-eyebrow"><span></span> O MUNDO EM PAUTA</p>
+                    <h2 id="news-heading">Notícias do país</h2>
+                    <p id="news-context" class="news-context">As manchetes acompanham o país que você pesquisar.</p>
+                </div>
+                <span id="news-count" class="news-count" hidden></span>
+            </div>
+            <div id="news-list" class="news-grid"></div>
         </section>
         <section id="como-funciona" class="mt-8 text-sm text-slate-500">
             <h2 class="font-bold">Como funciona</h2>
