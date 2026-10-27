@@ -102,11 +102,14 @@ O navegador acessa somente endpoints `/api` da própria aplicação para os dado
 | `/api/weather/{capital},{codigoPais}` | Clima da capital em °C |
 | `/api/time/coordinates?latitude=...&longitude=...` | Horário e fuso IANA da capital |
 | `/api/time?timeZone=America/Sao_Paulo` | Consulta direta por fuso IANA |
-| `/api/currency/{moeda}` | Taxa de 1 USD para a moeda local |
+| `/api/currency/{moeda}` | Taxa de 1 BRL para a moeda local |
 | `/api/news/{pais}` | Até seis notícias em português com o nome do país no título; aceita também o código ISO (BR, JP, PT) |
 
-O conversor multiplica o valor em USD pela taxa carregada, sem uma nova chamada
-por digitação. Países com vários fusos usam o horário da capital. As consultas
+O conversor sempre recebe valores em reais (BRL) e multiplica pela taxa de BRL
+para a moeda do país, sem uma nova chamada por digitação. Como o provedor fornece
+taxas com uma base comum, o backend calcula `taxaDestino / taxaBRL` usando as duas
+cotações da mesma resposta. Para BRL → BRL, retorna 1 sem consultar o provedor.
+Países com vários fusos usam o horário da capital. As consultas
 complementares são paralelas, têm timeout e falham independentemente; uma nova
 busca cancela a anterior no navegador para impedir resultados misturados.
 
