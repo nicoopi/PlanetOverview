@@ -19,14 +19,15 @@ public class NewsService : INewsService
     public async Task<NewsApiResponse?> GetNewsAsync(string pais)
     {
         string? chaveApi = _config["ApiConfigs:NewsApiKey"];
-        string urlRequisicao = $"https://newsapi.org/v2/everything?q={pais}&apiKey={chaveApi}";
+        if (string.IsNullOrWhiteSpace(chaveApi) || string.IsNullOrWhiteSpace(pais)) return null;
+        string urlRequisicao = $"https://newsapi.org/v2/everything?q={Uri.EscapeDataString(pais.Trim())}&apiKey={Uri.EscapeDataString(chaveApi)}&pageSize=6&sortBy=publishedAt";
 
         if (!_httpClient.DefaultRequestHeaders.Contains("User-Agent"))
         {
             _httpClient.DefaultRequestHeaders.Add("User-Agent", "PlanetOverview-App");
         }
 
-        var response = await _httpClient.GetFromJsonAsync<NewsApiResponse>(urlRequisicao);
+        var response = await ApiClient.ReadAsync<NewsApiResponse>(_httpClient, urlRequisicao);
 
         return response;
     }

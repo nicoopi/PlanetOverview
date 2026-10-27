@@ -4,6 +4,10 @@ namespace PlanetOverview.Models.ApiResponses;
 
 public class CountryApiResponse
 {
+    public string[]? AltSpellings { get; set; }
+    public CapitalCoordinates? CapitalInfo { get; set; }
+    public Dictionary<string, CountryName>? Translations { get; set; }
+    public Dictionary<string, CountryCurrency>? Currencies { get; set; }
     [JsonPropertyName("name")]
     public CountryName? Name { get; set; }
 
@@ -48,4 +52,14 @@ public class CountryFlags
 
     [JsonPropertyName("svg")]
     public string? Svg { get; set; }
+}
+public class CountryCurrency
+{
+    public string? Name { get; set; }
+    public string? Symbol { get; set; }
+}
+
+public class CapitalCoordinates
+{
+    public double[]? Latlng { get; set; }
 }

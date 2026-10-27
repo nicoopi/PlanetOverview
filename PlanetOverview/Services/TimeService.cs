@@ -1,5 +1,3 @@
-using System.Net;
-using System.Net.Http.Json;
 using PlanetOverview.Models;
 using PlanetOverview.Models.ApiResponses;
 using PlanetOverview.Services.Interfaces;
@@ -15,6 +13,15 @@ public class TimeService : ITimeService
         _httpClient = httpClient;
     }
 
+    public async Task<TimeOverview?> GetByCoordinatesAsync(double latitude, double longitude)
+    {
+        var url = FormattableString.Invariant($"https://timeapi.io/api/Time/current/coordinate?latitude={latitude}&longitude={longitude}");
+        var response = await ApiClient.ReadAsync<TimeApiResponse>(_httpClient, url);
+        if (response == null || !DateTime.TryParse(response.DateTime, out var local)) return null;
+        return new TimeOverview { TimeZone = response.TimeZone, LocalDateTime = local,
+            Date = local.ToString("dd/MM/yyyy"), Time = local.ToString("HH:mm:ss") };
+    }
+
     public async Task<TimeOverview?> GetCurrentTimeAsync(string timeZone)
     {
         if (string.IsNullOrWhiteSpace(timeZone))
@@ -24,22 +31,8 @@ public class TimeService : ITimeService
 
         var encodedTimeZone = Uri.EscapeDataString(timeZone.Trim());
 
-        var response = await _httpClient.GetAsync(
-            $"https://timeapi.io/api/Time/current/zone?timeZone={encodedTimeZone}"
-        );
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return null;
-        }
-
-        var apiResponse = await response.Content
-            .ReadFromJsonAsync<TimeApiResponse>();
+        var apiResponse = await ApiClient.ReadAsync<TimeApiResponse>(_httpClient,
+            $"https://timeapi.io/api/Time/current/zone?timeZone={encodedTimeZone}");
 
         if (apiResponse == null ||
             string.IsNullOrWhiteSpace(apiResponse.DateTime))

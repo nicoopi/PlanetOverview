@@ -1,81 +1,48 @@
-using System.Net;
-using System.Net.Http.Json;
 using PlanetOverview.Models;
 using PlanetOverview.Models.ApiResponses;
 using PlanetOverview.Services.Interfaces;
-
 namespace PlanetOverview.Services;
-
 public class CountryService : ICountryService
 {
-    private readonly HttpClient _httpClient;
+    private static readonly CountryApiResponse[] Countries = LoadCountries();
 
-    public CountryService(HttpClient httpClient)
+    private static CountryApiResponse[] LoadCountries()
     {
-        _httpClient = httpClient;
+        using var stream = typeof(CountryService).Assembly.GetManifestResourceStream("PlanetOverview.Data.countries.json")
+            ?? throw new InvalidOperationException("Base de países não encontrada.");
+        return System.Text.Json.JsonSerializer.Deserialize<CountryApiResponse[]>(stream,
+            new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web)) ?? [];
     }
 
-    public async Task<CountryOverview?> GetCountry(string country)
+    private static IEnumerable<string> Names(CountryApiResponse country) =>
+        new[] { country.Name?.Common, country.Name?.Official, country.Cca2 }
+            .Concat(country.Translations?.Values.SelectMany(t => new[] { t.Common, t.Official }) ?? [])
+            .Concat(country.AltSpellings ?? [])
+            .OfType<string>();
+
+    private static string Normalize(string value) => string.Concat(value.Normalize(System.Text.NormalizationForm.FormD)
+        .Where(c => System.Globalization.CharUnicodeInfo.GetUnicodeCategory(c) != System.Globalization.UnicodeCategory.NonSpacingMark))
+        .ToUpperInvariant();
+
+    public Task<CountryOverview?> GetCountry(string country) => Task.FromResult(FindCountry(country));
+
+    private static CountryOverview? FindCountry(string country)
     {
-        if (string.IsNullOrWhiteSpace(country))
-        {
-            return null;
-        }
-
-        var encodedCountry = Uri.EscapeDataString(country.Trim());
-
-        var response = await _httpClient.GetAsync(
-            $"https://restcountries.com/v3.1/name/{encodedCountry}"
-        );
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return null;
-        }
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return null;
-        }
-
-        var countries = await response.Content
-            .ReadFromJsonAsync<CountryApiResponse[]>();
-
-        if (countries == null || countries.Length == 0)
-        {
-            return null;
-        }
-
-        var apiCountry = countries.FirstOrDefault(
-            c => c.Name?.Common != null &&
-                 c.Name.Common.Equals(
-                     country.Trim(),
-                     StringComparison.OrdinalIgnoreCase
-                 )
-        ) ?? countries[0];
-
-        if (apiCountry.Name?.Common == null ||
-            string.IsNullOrWhiteSpace(apiCountry.Cca2))
-        {
-            return null;
-        }
-
-        var language = apiCountry.Languages != null
-            ? string.Join(", ", apiCountry.Languages.Values)
-            : null;
-
-        var capital = apiCountry.Capital?.FirstOrDefault();
-
+        if (string.IsNullOrWhiteSpace(country)) return null;
+        var query = Normalize(country.Trim());
+        var selected = Countries.FirstOrDefault(c => Names(c).Any(name => Normalize(name) == query))
+            ?? Countries.FirstOrDefault(c => Names(c).Any(name => Normalize(name).Contains(query)));
+        if (selected?.Name?.Common == null || string.IsNullOrWhiteSpace(selected.Cca2)) return null;
+        var portuguese = selected.Translations?.GetValueOrDefault("por");
         return new CountryOverview
         {
-            Country = apiCountry.Name.Common,
-            CountryName = apiCountry.Name.Official,
-            Capital = capital,
-            CountryCode = apiCountry.Cca2,
-            Population = apiCountry.Population,
-            FlagUrl = apiCountry.Flags?.Svg ?? apiCountry.Flags?.Png,
-            Language = language,
-            TimeZones = apiCountry.Timezones?.ToList() ?? []
+            CapitalCoordinates = selected.CapitalInfo?.Latlng,
+            Country = selected.Name.Common, CountryName = portuguese?.Common ?? selected.Name.Common,
+            Capital = selected.Capital?.FirstOrDefault(), CountryCode = selected.Cca2,
+            CurrencyCode = selected.Currencies?.Keys.FirstOrDefault(), Population = selected.Population,
+            FlagUrl = selected.Flags?.Svg ?? selected.Flags?.Png,
+            Language = selected.Languages == null ? null : string.Join(", ", selected.Languages.Values),
+            TimeZones = selected.Timezones?.ToList() ?? []
         };
     }
 }

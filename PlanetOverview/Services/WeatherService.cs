@@ -18,11 +18,12 @@ public class WeatherService : IWeatherService
     public async Task<WeatherOverview?> GetWeather(string capital)
     {   
         var chaveApi = _config["ApiConfigs:WeatherApiKey"];
-        var response = await _httpClient.GetFromJsonAsync<WeatherApiResponse>(
-            $"https://api.openweathermap.org/data/2.5/weather?q={capital}&appid={chaveApi}&units=metric&lang=pt_br"
+        if (string.IsNullOrWhiteSpace(chaveApi) || string.IsNullOrWhiteSpace(capital)) return null;
+        var response = await ApiClient.ReadAsync<WeatherApiResponse>(_httpClient,
+            $"https://api.openweathermap.org/data/2.5/weather?q={Uri.EscapeDataString(capital.Trim())}&appid={Uri.EscapeDataString(chaveApi)}&units=metric&lang=pt_br"
         );
 
-        if (response == null)
+        if (response?.Main == null || response.Weather == null || response.Weather.Length == 0)
         {
             return null;
         }
