@@ -21,25 +21,32 @@ public class CurrencyService : ICurrencyService
         if (string.IsNullOrWhiteSpace(targetCurrency)) return null;
         targetCurrency = targetCurrency.Trim().ToUpperInvariant();
         if (targetCurrency.Length != 3 || !targetCurrency.All(char.IsAsciiLetter)) return null;
+
+        if (targetCurrency == "BRL")
+            return new CurrencyOverview { BaseCurrency = "BRL", TargetCurrency = "BRL", ExchangeRate = 1m };
         
         var chaveApi = _config["ApiConfigs:CurrencyApiKey"];
         if (string.IsNullOrWhiteSpace(chaveApi)) return null;
-        var url = $"https://api.currencyfreaks.com/v2.0/rates/latest?apikey={Uri.EscapeDataString(chaveApi)}&symbols={targetCurrency}";
+        var url = $"https://api.currencyfreaks.com/v2.0/rates/latest?apikey={Uri.EscapeDataString(chaveApi)}&symbols=BRL,{targetCurrency}";
 
         var response = await ApiClient.ReadAsync<CurrencyApiResponse>(_httpClient, url);
 
-        if (response?.Rates == null || !response.Rates.ContainsKey(targetCurrency))
+        if (response?.Rates == null || !response.Rates.ContainsKey(targetCurrency) || !response.Rates.ContainsKey("BRL"))
         {
             return null;
         }
 
-        if (decimal.TryParse(response.Rates[targetCurrency], System.Globalization.CultureInfo.InvariantCulture, out decimal rate))
+        if (decimal.TryParse(response.Rates[targetCurrency], System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal rate) && rate > 0 &&
+            decimal.TryParse(response.Rates["BRL"], System.Globalization.NumberStyles.Float,
+                System.Globalization.CultureInfo.InvariantCulture, out decimal brlRate) && brlRate > 0)
         {
             return new CurrencyOverview
             {
-                BaseCurrency = response.Base,
+                BaseCurrency = "BRL",
                 TargetCurrency = targetCurrency,
-                ExchangeRate = rate
+                // Both rates share the provider's base, so their ratio gives BRL -> target.
+                ExchangeRate = rate / brlRate
             };
         }
 
