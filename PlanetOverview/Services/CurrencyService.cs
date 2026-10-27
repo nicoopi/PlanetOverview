@@ -18,14 +18,17 @@ public class CurrencyService : ICurrencyService
 
     public async Task<CurrencyOverview?> GetExchangeRateAsync(string targetCurrency)
     {
-        targetCurrency = targetCurrency.ToUpper();
+        if (string.IsNullOrWhiteSpace(targetCurrency)) return null;
+        targetCurrency = targetCurrency.Trim().ToUpperInvariant();
+        if (targetCurrency.Length != 3 || !targetCurrency.All(char.IsAsciiLetter)) return null;
         
         var chaveApi = _config["ApiConfigs:CurrencyApiKey"];
-        var url = $"https://api.currencyfreaks.com/v2.0/rates/latest?apikey={chaveApi}&symbols={targetCurrency}";
+        if (string.IsNullOrWhiteSpace(chaveApi)) return null;
+        var url = $"https://api.currencyfreaks.com/v2.0/rates/latest?apikey={Uri.EscapeDataString(chaveApi)}&symbols={targetCurrency}";
 
-        var response = await _httpClient.GetFromJsonAsync<CurrencyApiResponse>(url);
+        var response = await ApiClient.ReadAsync<CurrencyApiResponse>(_httpClient, url);
 
-        if (response == null || !response.Rates.ContainsKey(targetCurrency))
+        if (response?.Rates == null || !response.Rates.ContainsKey(targetCurrency))
         {
             return null;
         }

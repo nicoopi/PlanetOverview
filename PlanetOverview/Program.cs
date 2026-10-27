@@ -6,18 +6,26 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddHttpClient<INewsService, NewsService>();
-builder.Services.AddHttpClient<ICountryService, CountryService>();
+builder.Services.AddSingleton<ICountryService, CountryService>();
 builder.Services.AddHttpClient<ITimeService, TimeService>();
+builder.Services.AddHttpClient<IWeatherService, WeatherService>();
+builder.Services.AddHttpClient<ICurrencyService, CurrencyService>();
+builder.Services.ConfigureHttpClientDefaults(client =>
+{
+    client.ConfigureHttpClient(http => http.Timeout = TimeSpan.FromSeconds(20));
+    // Provider request URLs can contain API keys.
+    client.RemoveAllLoggers();
+});
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseExceptionHandler("/Overview/Error");
     app.UseHsts();
+    app.UseHttpsRedirection();
 }
 
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();

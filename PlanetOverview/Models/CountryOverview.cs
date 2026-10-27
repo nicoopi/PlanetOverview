@@ -3,8 +3,11 @@ namespace PlanetOverview.Models;
 public class CountryOverview
 {
     public string? Country { get; set; }
+    public string DataSource { get; set; } = "Base local REST Countries";
     public string? Capital { get; set; }
     public string? CountryCode { get; set; }
+    public double[]? CapitalCoordinates { get; set; }
+    public string? CurrencyCode { get; set; }
     public long Population { get; set; } 
     public WeatherOverview? Weather { get; set; }
     public string? CountryName { get; set; }
