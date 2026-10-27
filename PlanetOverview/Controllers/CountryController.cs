@@ -14,6 +14,10 @@ public class CountryController : ControllerBase
         _countryService = countryService;
     }
 
+    [HttpGet]
+    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
+    public IActionResult GetCountries() => Ok(_countryService.GetCountries());
+
     [HttpGet("{country}")]
     public async Task<IActionResult> GetCountry(string country)
     {
