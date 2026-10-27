@@ -28,27 +28,127 @@
         } catch { return null; }
     }
 
+    function newsMessage(title, message) {
+        const panel = document.createElement('div');
+        panel.className = 'news-empty';
+        const heading = document.createElement('h3');
+        heading.textContent = title;
+        const description = document.createElement('p');
+        description.textContent = message;
+        panel.append(heading, description);
+        byId('news-list').replaceChildren(panel);
+        byId('country-news').setAttribute('aria-busy', 'false');
+        byId('news-count').hidden = true;
+    }
+
+    function newsIcon(pathData) {
+        const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '1.5');
+        icon.setAttribute('aria-hidden', 'true');
+        const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        path.setAttribute('d', pathData);
+        icon.append(path);
+        return icon;
+    }
+
+    function newsLoading() {
+        byId('news-list').replaceChildren();
+        byId('country-news').setAttribute('aria-busy', 'true');
+        byId('news-count').hidden = true;
+        for (let index = 0; index < 3; index++) {
+            const skeleton = document.createElement('div');
+            skeleton.className = 'news-skeleton';
+            skeleton.setAttribute('aria-hidden', 'true');
+            byId('news-list').append(skeleton);
+        }
+    }
+
     function renderNews(news) {
         const container = byId('news-list');
         container.replaceChildren();
+        const countryName = news.countryName || 'País pesquisado';
+        text('news-heading', `${countryName} em pauta`);
+        text('news-context', 'Manchetes em português sobre o país pesquisado, das mais recentes às mais antigas.');
         for (const article of news.articles || []) {
             const url = safeUrl(article.url);
             if (!url || !article.title || article.title === '[Removed]') continue;
             const card = document.createElement('article');
-            card.className = 'bg-white border border-slate-200 rounded-xl p-5';
+            card.className = 'news-card';
             const link = document.createElement('a');
             link.href = url;
             link.target = '_blank';
             link.rel = 'noopener noreferrer';
-            link.className = 'font-bold text-blue-600 hover:underline';
-            link.textContent = article.title;
+            link.className = 'news-card-link';
+            const media = document.createElement('div');
+            media.className = 'news-media';
+            const placeholder = document.createElement('div');
+            placeholder.className = 'news-placeholder';
+            placeholder.setAttribute('aria-hidden', 'true');
+            const icon = newsIcon('M4 4h16v16H4z M8 8h8 M8 12h3 M8 16h3 M14 12h2 M14 16h2');
+            placeholder.append(icon);
+            media.append(placeholder);
+            const imageUrl = safeUrl(article.urlToImage);
+            if (imageUrl) {
+                const image = document.createElement('img');
+                image.alt = ''; // The adjacent headline names the same link.
+                image.loading = 'lazy';
+                image.decoding = 'async';
+                image.referrerPolicy = 'no-referrer';
+                image.addEventListener('load', () => image.classList.add('is-loaded'), { once: true });
+                image.addEventListener('error', () => image.remove(), { once: true });
+                image.src = imageUrl;
+                media.append(image);
+            }
+            const tag = document.createElement('span');
+            tag.className = 'news-tag';
+            tag.textContent = countryName;
+            media.append(tag);
+            const content = document.createElement('div');
+            content.className = 'news-content';
+            const meta = document.createElement('div');
+            meta.className = 'news-meta';
+            const source = document.createElement('span');
+            source.className = 'news-source';
+            source.textContent = article.source?.name || 'Imprensa';
+            meta.append(source);
+            const published = new Date(article.publishedAt || '');
+            if (Number.isFinite(published.getTime())) {
+                const separator = document.createElement('span');
+                separator.textContent = '·';
+                const date = document.createElement('time');
+                date.dateTime = published.toISOString();
+                date.textContent = published.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short', year: 'numeric' });
+                meta.append(separator, date);
+            }
+            const heading = document.createElement('h3');
+            heading.className = 'news-title';
+            heading.textContent = article.title;
             const description = document.createElement('p');
-            description.className = 'text-sm text-slate-500 mt-2';
-            description.textContent = article.description || article.source?.name || '';
-            card.append(link, description);
+            description.className = 'news-description';
+            description.textContent = article.description || '';
+            const read = document.createElement('div');
+            read.className = 'news-read';
+            const label = document.createElement('span');
+            label.textContent = 'Ler reportagem';
+            const arrow = newsIcon('M6 18 18 6 M6 6h12v12');
+            read.append(label, arrow);
+            content.append(meta, heading, description, read);
+            link.append(media, content);
+            card.append(link);
             container.append(card);
         }
-        text('news-status', container.childElementCount ? `${container.childElementCount} notícias abaixo` : 'Nenhuma notícia encontrada.');
+        const count = container.childElementCount;
+        text('news-status', count ? `${count} notícias sobre ${countryName}` : 'Nenhuma notícia recente');
+        byId('country-news').setAttribute('aria-busy', 'false');
+        if (count) {
+            text('news-count', `${count} ${count === 1 ? 'reportagem' : 'reportagens'}`);
+            byId('news-count').hidden = false;
+        } else {
+            newsMessage('Nenhuma manchete encontrada', `Ainda não há notícias em português com o nome de ${countryName} no título. Tente novamente mais tarde.`);
+        }
     }
 
     async function search(event) {
@@ -61,7 +161,9 @@
         clearInterval(clock);
         exchangeRate = undefined;
         currency = undefined;
-        byId('news-list').replaceChildren();
+        newsLoading();
+        text('news-heading', 'Notícias do país');
+        text('news-context', 'Consultando as manchetes do país pesquisado…');
         byId('country-flag').hidden = true;
         for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate', 'news-status']) text(id, 'Carregando…');
         for (const id of ['weather-description', 'time-zone', 'currency-result']) text(id, '');
@@ -75,6 +177,7 @@
             const country = await api(`/api/country/${encodeURIComponent(query)}`, signal);
             if (signal.aborted) return;
             text('country-title', `Visão geral: ${country.countryName || country.country}`);
+            text('news-heading', `${country.countryName || country.country} em pauta`);
             text('country-source', `${country.dataSource} · dados gerais de referência`);
             text('capital', country.capital || 'Sem capital informada');
             text('language', country.language || 'Não informado');
@@ -123,9 +226,13 @@
                     convert();
                 }, () => text('currency-rate', 'Câmbio indisponível')),
                 card(async () => {
-                    const news = await api(`/api/news/${encodeURIComponent(country.country)}`, signal);
+                    const news = await api(`/api/news/${encodeURIComponent(country.countryCode)}`, signal);
                     if (!signal.aborted) renderNews(news);
-                }, () => text('news-status', 'Notícias indisponíveis'))
+                }, () => {
+                    text('news-status', 'Notícias indisponíveis');
+                    text('news-context', 'Não foi possível atualizar as manchetes desta consulta.');
+                    newsMessage('As notícias estão indisponíveis', 'Tente buscar o país novamente em alguns instantes.');
+                })
             ]);
             if (signal.aborted) return;
             text('updated-at', `Consultado às ${new Date().toLocaleTimeString('pt-BR')}`);
@@ -134,6 +241,9 @@
             if (signal.aborted) return;
             text('search-status', error.message === '404' ? 'País não encontrado ou serviço indisponível. Confira o nome e tente novamente.' : 'Não foi possível consultar o país. Tente novamente.');
             text('country-title', 'Nenhum país carregado');
+            text('news-heading', 'Notícias do país');
+            text('news-context', 'As manchetes acompanham o país que você pesquisar.');
+            newsMessage('Escolha um país para explorar', 'Confira o nome digitado e faça uma nova busca.');
             text('updated-at', 'Consulta não concluída');
             for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate', 'news-status']) text(id, '—');
         } finally {

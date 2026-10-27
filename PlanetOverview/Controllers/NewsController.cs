@@ -19,9 +19,9 @@ public class NewsController : ControllerBase
     {
         var result = await _newsService.GetNewsAsync(pais);
 
-        if (result == null || result.Articles == null || result.Articles.Count == 0)
+        if (result == null)
         {
-            return NotFound("Nenhuma notícia encontrada ou falha na comunicação com o serviço.");
+            return StatusCode(StatusCodes.Status503ServiceUnavailable, "Não foi possível consultar o serviço de notícias.");
         }
 
         return Ok(result);
