@@ -22,9 +22,6 @@ public class CurrencyService : ICurrencyService
         targetCurrency = targetCurrency.Trim().ToUpperInvariant();
         if (targetCurrency.Length != 3 || !targetCurrency.All(char.IsAsciiLetter)) return null;
 
-        if (targetCurrency == "BRL")
-            return new CurrencyOverview { BaseCurrency = "BRL", TargetCurrency = "BRL", ExchangeRate = 1m };
-        
         var chaveApi = _config["ApiConfigs:CurrencyApiKey"];
         if (string.IsNullOrWhiteSpace(chaveApi)) return null;
         var url = $"https://api.currencyfreaks.com/v2.0/rates/latest?apikey={Uri.EscapeDataString(chaveApi)}&symbols=BRL,{targetCurrency}";

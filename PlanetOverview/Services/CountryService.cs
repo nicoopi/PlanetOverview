@@ -15,12 +15,6 @@ public sealed class CountryService : ICountryService
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
     private readonly IMemoryCache _cache;
-    private static readonly CountryApiResponse[] LocalCountries = LoadLocalCountries();
-
-    // Índice calculado uma vez (antes, cada busca normalizava ~25 mil strings).
-    private static readonly (CountryApiResponse Country, HashSet<string> Names)[] LocalIndex =
-        LocalCountries.Select(c => (c, LocalNames(c).Select(Normalize).ToHashSet())).ToArray();
-
     // Moedas sem cotação em provedores de câmbio e exceções de moeda principal.
     private static readonly HashSet<string> UnquotedCurrencies = new(StringComparer.OrdinalIgnoreCase)
         { "CUC", "GGP", "JEP", "IMP", "FOK", "KID", "TVD", "CKD" };
@@ -34,88 +28,54 @@ public sealed class CountryService : ICountryService
         _cache = cache;
     }
 
-    private static CountryApiResponse[] LoadLocalCountries()
+    private async Task<List<CountryOverview>?> LoadCountriesAsync()
     {
-        using var stream = typeof(CountryService).Assembly.GetManifestResourceStream("PlanetOverview.Data.countries.json")
-            ?? throw new InvalidOperationException("Base local de países não encontrada.");
-        return JsonSerializer.Deserialize<CountryApiResponse[]>(stream,
-            new JsonSerializerOptions(JsonSerializerDefaults.Web)) ?? [];
+        if (_cache.TryGetValue("country-catalog", out List<CountryOverview>? cached) && cached != null) return cached;
+        var key = _configuration["ApiConfigs:CountriesApiKey"];
+        if (string.IsNullOrWhiteSpace(key)) return null;
+        var countries = new List<CountryOverview>();
+        var baseUrl = (_configuration["ApiConfigs:CountriesBaseUrl"] ?? ApiBase).TrimEnd('/');
+        try
+        {
+            for (var offset = 0; ;)
+            {
+                using var request = new HttpRequestMessage(HttpMethod.Get, $"{baseUrl}?limit=100&offset={offset}");
+                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", key.Trim());
+                using var response = await _httpClient.SendAsync(request);
+                if (!response.IsSuccessStatusCode) return null;
+                using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync());
+                var objects = GetPath(document.RootElement, "data", "objects");
+                if (objects.ValueKind != JsonValueKind.Array) return null;
+                foreach (var item in objects.EnumerateArray())
+                {
+                    var itemCountry = MapV5(item);
+                    if (itemCountry != null) countries.Add(itemCountry);
+                }
+                var count = objects.GetArrayLength();
+                if (GetPath(document.RootElement, "data", "meta", "more").ValueKind != JsonValueKind.True) break;
+                if (count == 0) return null;
+                offset += count;
+            }
+            if (countries.Count == 0) return null;
+            _cache.Set("country-catalog", countries, TimeSpan.FromHours(1));
+            return countries;
+        }
+        catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException or InvalidOperationException) { return null; }
+    }
+
+    public async Task<IReadOnlyList<CountrySuggestion>?> GetCountries()
+    {
+        var countries = await LoadCountriesAsync();
+        return countries?.Select(c => new CountrySuggestion(c.CountryName ?? c.Country!, c.Country!, c.CountryCode!)).ToList();
     }
 
     public async Task<CountryOverview?> GetCountry(string country)
     {
         if (string.IsNullOrWhiteSpace(country)) return null;
-
-        // 1) Resolve o nome digitado (pt/en/sigla) para UM país na base local, de forma exata.
-        //    Evita o erro de busca parcial da API (ex.: "Estados Unidos" casar com "Estados Unidos Mexicanos").
-        var local = FindLocalCountry(country);
-        if (local?.CountryCode == null) return null;
-
-        var cacheKey = $"country:{local.CountryCode}";
-        if (_cache.TryGetValue(cacheKey, out CountryOverview? cached) && cached != null) return cached;
-
-        // 2) Consulta a v5 por código ISO (endpoint documentado de leitura) e completa campos ausentes com a base local.
-        var live = await GetLiveCountryAsync(local.CountryCode);
-        var result = live == null ? local : Merge(live, local);
-
-        _cache.Set(cacheKey, result, live != null ? TimeSpan.FromHours(1) : TimeSpan.FromMinutes(5));
-        return result;
-    }
-
-    private async Task<CountryOverview?> GetLiveCountryAsync(string alpha2)
-    {
-        var apiKey = _configuration["ApiConfigs:CountriesApiKey"];
-        if (string.IsNullOrWhiteSpace(apiKey)) return null;
-        try
-        {
-            var baseUrl = (_configuration["ApiConfigs:CountriesBaseUrl"] ?? ApiBase).TrimEnd('/');
-            using var request = new HttpRequestMessage(HttpMethod.Get,
-                $"{baseUrl}/codes.alpha_2/{Uri.EscapeDataString(alpha2)}");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", apiKey.Trim());
-            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(5)); // não deixa a tela esperando 20s
-            using var response = await _httpClient.SendAsync(request, timeout.Token);
-            if (!response.IsSuccessStatusCode) return null;
-
-            using var document = await JsonDocument.ParseAsync(await response.Content.ReadAsStreamAsync(timeout.Token), cancellationToken: timeout.Token);
-            var objects = GetPath(document.RootElement, "data", "objects");
-            if (objects.ValueKind != JsonValueKind.Array) return null;
-            foreach (var item in objects.EnumerateArray())
-                if (string.Equals(Text(item, "codes", "alpha_2"), alpha2, StringComparison.OrdinalIgnoreCase))
-                    return MapV5(item);
-        }
-        catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException or InvalidOperationException)
-        {
-            // A indisponibilidade da API externa não deve derrubar o restante do painel.
-        }
-        return null;
-    }
-
-    // Campo a campo: o que a v5 não trouxe (ou veio em formato inesperado) vem da base local.
-    private static CountryOverview Merge(CountryOverview live, CountryOverview local)
-    {
-        var filled = false;
-        T? Pick<T>(T? fromLive, T? fromLocal, Func<T?, bool> isEmpty)
-        {
-            if (!isEmpty(fromLive)) return fromLive;
-            if (!isEmpty(fromLocal)) filled = true;
-            return fromLocal;
-        }
-        var merged = new CountryOverview
-        {
-            Country = live.Country,
-            CountryCode = live.CountryCode,
-            CountryName = live.CountryName,
-            Population = live.Population > 0 ? live.Population : local.Population,
-            Capital = Pick(live.Capital, local.Capital, string.IsNullOrWhiteSpace),
-            CapitalCoordinates = Pick(live.CapitalCoordinates, local.CapitalCoordinates, c => c is not { Length: >= 2 }),
-            CurrencyCode = Pick(live.CurrencyCode, local.CurrencyCode, string.IsNullOrWhiteSpace),
-            Language = Pick(live.Language, local.Language, string.IsNullOrWhiteSpace),
-            FlagUrl = Pick(live.FlagUrl, local.FlagUrl, string.IsNullOrWhiteSpace),
-            TimeZones = live.TimeZones.Count > 0 ? live.TimeZones : local.TimeZones,
-        };
-        if (live.Population <= 0) filled = true;
-        merged.DataSource = filled ? "REST Countries API v5 + base local (campos complementares)" : "REST Countries API v5";
-        return merged;
+        var countries = await LoadCountriesAsync();
+        if (countries == null) return null;
+        var query = Normalize(country.Trim());
+        return countries.FirstOrDefault(c => new[] { c.CountryName, c.Country, c.CountryCode }.Any(name => name != null && Normalize(name) == query));
     }
 
     private static string? PickCurrency(string? alpha2, IEnumerable<string> codes)
@@ -149,9 +109,12 @@ public sealed class CountryService : ICountryService
         double[]? latlng = lat.HasValue && lng.HasValue ? [lat.Value, lng.Value] : null;
 
         var currencies = GetPath(item, "currencies");
-        string? currencyCode = currencies.ValueKind == JsonValueKind.Object
-            ? PickCurrency(code, currencies.EnumerateObject().Select(p => p.Name))
-            : null;
+        string? currencyCode = currencies.ValueKind switch
+        {
+            JsonValueKind.Array => PickCurrency(code, currencies.EnumerateArray().Select(c => Text(c, "code") ?? "")),
+            JsonValueKind.Object => PickCurrency(code, currencies.EnumerateObject().Select(p => p.Name)),
+            _ => null
+        };
 
         var languages = GetPath(item, "languages");
         string? language = null;
@@ -183,37 +146,6 @@ public sealed class CountryService : ICountryService
         };
     }
 
-    private static CountryOverview? FindLocalCountry(string country)
-    {
-        var query = Normalize(country.Trim());
-        var selected = LocalIndex.FirstOrDefault(i => i.Names.Contains(query)).Country;
-        if (selected == null && query.Length >= 3) // "a" ou "ni" não devem "adivinhar" um país
-            selected = LocalIndex.FirstOrDefault(i => i.Names.Any(n => n.StartsWith(query))).Country
-                ?? LocalIndex.FirstOrDefault(i => i.Names.Any(n => n.Contains(query))).Country;
-        if (selected?.Name?.Common == null || string.IsNullOrWhiteSpace(selected.Cca2)) return null;
-        var portuguese = selected.Translations?.GetValueOrDefault("por");
-        return new CountryOverview
-        {
-            CapitalCoordinates = selected.CapitalInfo?.Latlng,
-            Country = selected.Name.Common,
-            CountryName = portuguese?.Common ?? selected.Name.Common,
-            Capital = selected.Capital?.FirstOrDefault(),
-            CountryCode = selected.Cca2,
-            CurrencyCode = PickCurrency(selected.Cca2, selected.Currencies?.Keys ?? Enumerable.Empty<string>()),
-            Population = selected.Population,
-            FlagUrl = selected.Flags?.Svg ?? selected.Flags?.Png,
-            Language = selected.Languages == null ? null : string.Join(", ", selected.Languages.Values),
-            TimeZones = selected.Timezones?.ToList() ?? [],
-            DataSource = "Base local REST Countries (fallback)"
-        };
-    }
-
-    private static IEnumerable<string> LocalNames(CountryApiResponse country) =>
-        new[] { country.Name?.Common, country.Name?.Official, country.Cca2 }
-            .Concat(country.Translations?.Values.SelectMany(t => new[] { t.Common, t.Official }) ?? [])
-            .Concat(country.AltSpellings ?? [])
-            .OfType<string>();
-
     private static JsonElement GetPath(JsonElement element, params string[] path)
     {
         foreach (var segment in path)
@@ -240,8 +172,4 @@ public sealed class CountryService : ICountryService
         .Where(c => CharUnicodeInfo.GetUnicodeCategory(c) != UnicodeCategory.NonSpacingMark))
         .ToUpperInvariant();
 
-    public IReadOnlyList<CountrySuggestion> GetCountries()
-    {
-        throw new NotImplementedException();
-    }
 }

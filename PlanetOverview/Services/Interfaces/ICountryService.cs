@@ -4,6 +4,6 @@ namespace PlanetOverview.Services.Interfaces;
 
 public interface ICountryService
 {
-    IReadOnlyList<CountrySuggestion> GetCountries();
+    Task<IReadOnlyList<CountrySuggestion>?> GetCountries();
     Task<CountryOverview?> GetCountry(string country);
 }

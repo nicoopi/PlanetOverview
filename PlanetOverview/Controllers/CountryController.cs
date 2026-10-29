@@ -16,7 +16,11 @@ public class CountryController : ControllerBase
 
     [HttpGet]
     [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
-    public IActionResult GetCountries() => Ok(_countryService.GetCountries());
+    public async Task<IActionResult> GetCountries()
+    {
+        var countries = await _countryService.GetCountries();
+        return countries == null ? StatusCode(503, "Serviço de países indisponível.") : Ok(countries);
+    }
 
     [HttpGet("{country}")]
     public async Task<IActionResult> GetCountry(string country)
