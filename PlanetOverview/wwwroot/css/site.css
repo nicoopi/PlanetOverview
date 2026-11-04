@@ -20,3 +20,66 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/* Configuração do Tema Escuro */
+html[data-theme="dark"] body {
+    background-color: #0f172a; /* bg-slate-900 */
+    color: #f8fafc; /* text-slate-50 */
+}
+
+html[data-theme="dark"] .bg-white {
+    background-color: #1e293b !important; /* bg-slate-800 */
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .bg-slate-50 {
+    background-color: #0f172a !important;
+    border-color: #334155 !important;
+}
+
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-\[\#001f3f\] {
+    color: #f8fafc !important;
+}
+
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+    color: #94a3b8 !important;
+}
+
+/* Corrige o fundo dos inputs e selects no Dark Mode */
+html[data-theme="dark"] input,
+html[data-theme="dark"] select {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+    border-color: #334155 !important;
+}
+
+/* Deixa o título das notícias claro no Dark Mode */
+html[data-theme="dark"] #news-heading {
+    color: #f8fafc !important;
+}
+
+/* Suporte do tema escuro para a lista de sugestões de países */
+[data-theme="dark"] .country-options {
+    background-color: #0f172a !important; /* Fundo escuro a combinar com o tema */
+    border-color: #334155 !important;    /* Borda sutil */
+}
+
+[data-theme="dark"] .country-option {
+    color: #f8fafc !important;           /* Texto claro para o nome do país */
+}
+
+[data-theme="dark"] .country-option:hover,
+[data-theme="dark"] .country-option[aria-selected="true"] {
+    background-color: #1e293b !important; /* Cor de destaque ao passar o rato ou navegar */
+}
+
+[data-theme="dark"] .country-option small {
+    color: #94a3b8 !important;           /* Cor secundária mais suave para o nome em inglês */
+}
+
+[data-theme="dark"] .country-no-results {
+    color: #94a3b8 !important;           /* Texto de "Nenhum país encontrado" */
+    background-color: #0f172a !important;
+}

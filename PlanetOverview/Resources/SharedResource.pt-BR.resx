@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="nav_home" xml:space="preserve">
+    <value>Início</value>
+  </data>
+  <data name="nav_how_it_works" xml:space="preserve">
+    <value>Como funciona</value>
+  </data>
+  <data name="hero_title" xml:space="preserve">
+    <value>Descubra o mundo em um só lugar</value>
+  </data>
+  <data name="hero_desc" xml:space="preserve">
+    <value>Pesquise qualquer país e veja informações atualizadas em uma única tela.</value>
+  </data>
+  <data name="search_placeholder" xml:space="preserve">
+    <value>Digite ou selecione um país...</value>
+  </data>
+  <data name="search_btn" xml:space="preserve">
+    <value>Buscar país</value>
+  </data>
+  <data name="realtime_status" xml:space="preserve">
+    <value>Consulta às APIs em tempo real</value>
+  </data>
+  <data name="overview_title" xml:space="preserve">
+    <value>Visão geral</value>
+  </data>
+  <data name="status_waiting" xml:space="preserve">
+    <value>Aguardando consulta</value>
+  </data>
+  <data name="label_capital" xml:space="preserve">
+    <value>Capital:</value>
+  </data>
+  <data name="label_language" xml:space="preserve">
+    <value>Idioma</value>
+  </data>
+  <data name="label_population" xml:space="preserve">
+    <value>População</value>
+  </data>
+  <data name="label_weather" xml:space="preserve">
+    <value>Clima agora</value>
+  </data>
+  <data name="label_time" xml:space="preserve">
+    <value>Horário na capital</value>
+  </data>
+  <data name="label_currency" xml:space="preserve">
+    <value>Conversor de moeda</value>
+  </data>
+  <data name="label_currency_value" xml:space="preserve">
+    <value>Valor em reais (BRL)</value>
+  </data>
+  <data name="news_eyebrow" xml:space="preserve">
+    <value>DIÁRIO DO MUNDO</value>
+  </data>
+  <data name="news_title_default" xml:space="preserve">
+    <value>Notícias do país</value>
+  </data>
+  <data name="news_context_default" xml:space="preserve">
+    <value>As manchetes acompanham o país que você pesquisar.</value>
+  </data>
+  <data name="footer_text" xml:space="preserve">
+    <value>Planet Overview — informações essenciais de qualquer país, em um só lugar.</value>
+  </data>
+  <data name="status_searching" xml:space="preserve">
+    <value>Buscando</value>
+  </data>
+  <data name="status_searching_details" xml:space="preserve">
+    <value>Buscando informações do país...</value>
+  </data>
+  <data name="news_em_pauta" xml:space="preserve">
+    <value>em pauta</value>
+  </data>
+  <data name="status_consultado" xml:space="preserve">
+    <value>Consultado às</value>
+  </data>
+  <data name="news_reportagens" xml:space="preserve">
+    <value>Reportagens:</value>
+  </data>
+  <data name="how_it_works_title" xml:space="preserve">
+    <value>Como o Planet Overview funciona</value>
+  </data>
+  <data name="how_it_works_desc" xml:space="preserve">
+    <value>Quatro passos para obter uma visão completa de qualquer país.</value>
+  </data>
+  <data name="step1_title" xml:space="preserve">
+    <value>Busque um país</value>
+  </data>
+  <data name="step1_desc" xml:space="preserve">
+    <value>Digite o nome do país ou escolha na lista alfabética ou no mapa interativo.</value>
+  </data>
+  <data name="step2_title" xml:space="preserve">
+    <value>Veja a visão geral</value>
+  </data>
+  <data name="step2_desc" xml:space="preserve">
+    <value>Cinco blocos consolidados: dados gerais, clima, fuso horário, câmbio e notícias.</value>
+  </data>
+  <data name="step3_title" xml:space="preserve">
+    <value>Personalize</value>
+  </data>
+  <data name="step3_desc" xml:space="preserve">
+    <value>Troque o idioma da interface, o tema claro/escuro e a moeda usada na conversão.</value>
+  </data>
+  <data name="step4_title" xml:space="preserve">
+    <value>Consulte de novo</value>
+  </data>
+  <data name="step4_desc" xml:space="preserve">
+    <value>Revisite rapidamente os países já pesquisados durante a sua sessão.</value>
+  </data>
+  <data name="cta_title" xml:space="preserve">
+    <value>Pronto para começar?</value>
+  </data>
+  <data name="cta_desc" xml:space="preserve">
+    <value>Não é necessário cadastro — a consulta é imediata.</value>
+  </data>
+  <data name="cta_btn" xml:space="preserve">
+    <value>Ir para a busca</value>
+  </data>
+</root>

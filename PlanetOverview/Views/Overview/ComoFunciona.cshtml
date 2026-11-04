@@ -1,0 +1,100 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<PlanetOverview.SharedResource> Localizer
+@{
+    Layout = null; 
+}
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Como Funciona - Planet Overview</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/news.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
+</head>
+<body class="bg-slate-50 font-sans text-slate-800 transition-colors duration-300">
+
+    <!-- Navegação -->
+    <nav class="bg-[#001f3f] text-white p-4 flex justify-between items-center px-10">
+        <div class="flex items-center gap-2 text-xl font-bold">
+            <i class="fas fa-globe"></i> Planet Overview
+        </div>
+        <div class="flex items-center">
+            <form id="lang-form" asp-controller="Overview" asp-action="MudarIdioma" method="post" class="mr-4">
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                <select name="culture" onchange="document.getElementById('lang-form').submit()" class="bg-[#001f3f] text-white border border-slate-500 rounded px-3 py-1.5 text-sm outline-none cursor-pointer">
+                    <option value="pt-BR" selected="@(System.Globalization.CultureInfo.CurrentCulture.Name == "pt-BR")">Português</option>
+                    <option value="en-US" selected="@(System.Globalization.CultureInfo.CurrentCulture.Name == "en-US")">English</option>
+                </select>
+            </form>
+            
+            <!-- Botão de Tema -->
+            <button id="theme-toggle" class="text-slate-300 hover:text-white border border-slate-500 rounded-full w-8 h-8 flex items-center justify-center transition-colors" aria-label="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Conteúdo do Como Funciona -->
+    <main class="max-w-6xl mx-auto mt-16 px-6 mb-24">
+        <!-- Cabeçalho da Página -->
+        <div class="text-center mb-12">
+            <h1 class="font-bold text-3xl md:text-4xl text-[#001f3f] mb-4">@Localizer["how_it_works_title"]</h1>
+            <p class="text-slate-500 text-lg">@Localizer["how_it_works_desc"]</p>
+        </div>
+
+        <!-- Grelha de 4 Passos -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            
+            <!-- Passo 1 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col h-full">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl mb-6">1</div>
+                <h3 class="text-lg font-bold text-[#001f3f] mb-3">@Localizer["step1_title"]</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">@Localizer["step1_desc"]</p>
+            </div>
+
+            <!-- Passo 2 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col h-full">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl mb-6">2</div>
+                <h3 class="text-lg font-bold text-[#001f3f] mb-3">@Localizer["step2_title"]</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">@Localizer["step2_desc"]</p>
+            </div>
+
+            <!-- Passo 3 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col h-full">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl mb-6">3</div>
+                <h3 class="text-lg font-bold text-[#001f3f] mb-3">@Localizer["step3_title"]</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">@Localizer["step3_desc"]</p>
+            </div>
+
+            <!-- Passo 4 -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8 flex flex-col h-full">
+                <div class="w-12 h-12 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xl mb-6">4</div>
+                <h3 class="text-lg font-bold text-[#001f3f] mb-3">@Localizer["step4_title"]</h3>
+                <p class="text-sm text-slate-500 leading-relaxed">@Localizer["step4_desc"]</p>
+            </div>
+
+        </div>
+
+        <!-- Cartão de Ação (CTA) -->
+        <div class="mt-8 bg-white rounded-xl shadow-sm border border-slate-200 p-10 text-center">
+            <h2 class="text-2xl font-bold text-[#001f3f] mb-3">@Localizer["cta_title"]</h2>
+            <p class="text-slate-500 mb-8">@Localizer["cta_desc"]</p>
+            <a asp-controller="Overview" asp-action="Index" class="inline-block bg-[#1a73e8] hover:bg-blue-700 text-white font-semibold py-3 px-10 rounded-lg transition-colors">
+                @Localizer["cta_btn"]
+            </a>
+        </div>
+    </main>
+    
+    <!-- Rodapé -->
+    <footer class="bg-[#001f3f] text-center text-slate-400 py-6 text-sm">
+        <div class="max-w-6xl mx-auto px-6 flex items-center justify-center">
+            <i class="fas fa-globe mr-3"></i> <span>@Localizer["footer_text"]</span>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true" defer></script>
+</body>
+</html>

@@ -1,5 +1,7 @@
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<PlanetOverview.SharedResource> Localizer
 @{
-    Layout = null;
+    Layout = null; 
 }
 
 <!DOCTYPE html>
@@ -11,47 +13,85 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="~/css/news.css" asp-append-version="true">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true">
 </head>
-<body class="bg-slate-50 font-sans text-slate-800">
+<body class="bg-slate-50 font-sans text-slate-800 transition-colors duration-300">
 
     <!-- Navegação -->
     <nav class="bg-[#001f3f] text-white p-4 flex justify-between items-center px-10">
         <div class="flex items-center gap-2 text-xl font-bold">
             <i class="fas fa-globe"></i> Planet Overview
         </div>
-        <div class="gap-6 text-sm hidden md:flex">
-            <a href="#" class="border-b-2 border-white pb-1">Início</a>
-            <a href="#como-funciona" class="text-slate-300 hover:text-white">Como funciona</a>
+        <div class="gap-6 text-sm hidden md:flex items-center">
+            <a asp-controller="Overview" asp-action="Index" class="border-b-2 border-white pb-1">@Localizer["nav_home"]</a>
+            <a asp-controller="Overview" asp-action="ComoFunciona" class="text-slate-300 hover:text-white">@Localizer["nav_how_it_works"]</a>
+            
+            <form id="lang-form" asp-controller="Overview" asp-action="MudarIdioma" method="post" class="ml-4">
+                <input type="hidden" name="returnUrl" value="@Context.Request.Path" />
+                <select name="culture" onchange="document.getElementById('lang-form').submit()" class="bg-[#001f3f] text-white border border-slate-500 rounded px-2 py-1 text-sm outline-none">
+                    <option value="pt-BR" selected="@(System.Globalization.CultureInfo.CurrentCulture.Name == "pt-BR")">Português</option>
+                    <option value="en-US" selected="@(System.Globalization.CultureInfo.CurrentCulture.Name == "en-US")">English</option>
+                </select>
+            </form>
+
+            <!-- Botão de Tema (Dark Mode) -->
+            <button id="theme-toggle" class="text-slate-300 hover:text-white border border-slate-500 rounded-full w-8 h-8 flex items-center justify-center transition-colors" aria-label="Alternar tema">
+                <i class="fas fa-moon"></i>
+            </button>
         </div>
     </nav>
 
-    <!-- Cabeçalho / Busca -->
-    <header class="max-w-5xl mx-auto mt-12 px-6 flex flex-col md:flex-row items-center justify-between">
-        <div class="w-full md:w-1/2">
-            <h1 class="text-4xl font-extrabold text-[#001f3f] mb-2">Descubra o mundo em um só lugar</h1>
-            <p class="text-slate-500 mb-6">Pesquise qualquer país e veja informações atualizadas em uma única tela.</p>
+    <!-- Cabeçalho / Busca (Com Fundo Slate-50) -->
+    <div class="w-full bg-slate-50 pt-12 pb-16">
+        <header class="max-w-6xl mx-auto px-6 grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             
-            <div class="country-picker">
-            <form id="country-search" class="flex w-full shadow-sm rounded-lg overflow-hidden border border-slate-200 bg-white">
-                <div class="p-3 text-slate-400 bg-white flex items-center justify-center">
-                    <i class="fas fa-search"></i>
+            <!-- Coluna da Esquerda: Textos e Pesquisa -->
+            <div>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-[#001f3f] mb-4 leading-tight">
+                    @Localizer["hero_title"]
+                </h1>
+                <p class="text-slate-500 mb-8 text-lg">
+                    @Localizer["hero_desc"]
+                </p>
+                
+                <div class="country-picker relative z-10">
+                    <form id="country-search" class="flex w-full shadow-md rounded-full overflow-hidden border border-slate-200 bg-white hover:border-blue-300 transition-colors">
+                        <div class="p-4 text-slate-400 bg-white flex items-center justify-center pl-6">
+                            <i class="fas fa-search"></i>
+                        </div>
+                        <input id="country-input" aria-label="País" role="combobox" aria-autocomplete="list" aria-controls="country-options" aria-expanded="false" autocomplete="off" spellcheck="false" required maxlength="100" value="Brasil" type="text" placeholder="@Localizer["search_placeholder"]" class="w-full min-w-0 p-4 outline-none text-slate-700 bg-transparent text-lg">
+                        <button id="search-button" type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-8 shrink-0 whitespace-nowrap transition-colors rounded-r-full">
+                            @Localizer["search_btn"]
+                        </button>
+                    </form>
+                    <div id="country-options" class="country-options absolute top-full left-0 right-0 mt-2 bg-white rounded-xl shadow-lg border border-slate-100 z-50 overflow-hidden" role="listbox" aria-label="Países sugeridos" hidden></div>
+                    <span id="country-suggestion-status" class="sr-only" role="status" aria-live="polite"></span>
                 </div>
-                <input id="country-input" aria-label="País" role="combobox" aria-autocomplete="list" aria-controls="country-options" aria-expanded="false" autocomplete="off" spellcheck="false" required maxlength="100" value="Brasil" type="text" placeholder="Digite ou selecione um país..." class="w-full min-w-0 p-3 outline-none text-slate-700">
-                <button id="search-button" type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 sm:px-6 shrink-0 whitespace-nowrap transition-colors">Buscar país</button>
-            </form>
-            <div id="country-options" class="country-options" role="listbox" aria-label="Países sugeridos" hidden></div>
-            <span id="country-suggestion-status" class="sr-only" role="status" aria-live="polite"></span>
-            </div>
-            <p id="country-source" class="mt-3 text-xs text-slate-500"></p>
-            <p id="search-status" role="status" aria-live="polite" class="mt-3 text-sm text-slate-600"></p>
-            
-            <div class="mt-4 flex items-center text-xs text-slate-500 bg-green-50 w-fit px-3 py-1 rounded-full border border-green-100">
-                <div class="w-2 h-2 bg-green-500 rounded-full mr-2"></div> Consulta às APIs em tempo real
-            </div>
-        </div>
-    </header>
 
-    <!-- Card de Visão Geral (Usando os dados do C#!) -->
+                <p id="country-source" class="mt-3 text-xs text-slate-400 ml-4"></p>
+                <p id="search-status" role="status" aria-live="polite" class="mt-2 text-sm text-slate-600 ml-4"></p>
+                
+                <div class="mt-6 flex items-center text-xs font-medium text-emerald-700 bg-emerald-50 w-fit px-4 py-2 rounded-full border border-emerald-100 shadow-sm">
+                    <span class="relative flex h-2.5 w-2.5 mr-2">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                        <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                    </span>
+                    <span>@Localizer["realtime_status"]</span>
+                </div>
+            </div>
+
+            <!-- Coluna da Direita: Imagem do Planeta -->
+            <div class="hidden md:flex justify-end items-center relative h-[360px] overflow-visible">
+                <img src="~/images/planetinha.png" 
+                     asp-append-version="true"
+                     alt="Ilustração de um planeta inteiro" 
+                     class="w-full max-w-[420px] object-contain drop-shadow-md">
+            </div>
+
+        </header>
+    </div>
+
+    <!-- Card de Visão Geral -->
     <main id="overview" aria-busy="false" class="max-w-5xl mx-auto mt-12 px-6 mb-20">
         <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 sm:p-8">
             
@@ -59,10 +99,10 @@
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 border-b border-slate-100 pb-4">
                 <div class="flex items-center gap-4">
                     <img id="country-flag" hidden alt="Bandeira do país" class="w-12 h-8 rounded shadow-sm border border-slate-100">
-                    <h2 class="text-2xl font-bold text-[#001f3f]" id="country-title">Visão geral</h2>
+                    <h2 class="text-2xl font-bold text-[#001f3f]" id="country-title">@Localizer["overview_title"]</h2>
                 </div>
                 <div class="text-sm text-slate-400 flex items-center gap-2">
-                    <i class="fas fa-sync-alt"></i> <span id="updated-at">Aguardando consulta</span>
+                    <i class="fas fa-sync-alt"></i> <span id="updated-at">@Localizer["status_waiting"]</span>
                 </div>
             </div>
 
@@ -73,7 +113,7 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="fas fa-landmark text-3xl text-slate-400"></i>
                     <div>
-                        <p class="text-sm text-slate-500">Capital:</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_capital"]</p>
                         <p class="text-xl font-bold"><span id="capital">—</span></p>
                     </div>
                 </div>
@@ -82,7 +122,7 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="far fa-comment-dots text-3xl text-blue-500"></i>
                     <div>
-                        <p class="text-sm text-slate-500">Idioma</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_language"]</p>
                         <p class="font-bold"><span id="language">—</span></p>
                     </div>
                 </div>
@@ -91,7 +131,7 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="fas fa-users text-3xl text-slate-400"></i>
                     <div>
-                        <p class="text-sm text-slate-500">População</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_population"]</p>
                         <p class="font-bold"><span id="population">—</span></p>
                     </div>
                 </div>
@@ -100,7 +140,7 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="fas fa-cloud-sun text-3xl text-slate-400"></i>
                     <div>
-                        <p class="text-sm text-slate-500">Clima agora</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_weather"]</p>
                         <p class="text-xl font-bold"><span id="weather">—</span><small id="weather-description" class="block text-sm font-normal"></small></p>
                     </div>
                 </div>
@@ -109,7 +149,7 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="far fa-clock text-3xl text-blue-500"></i>
                     <div>
-                        <p class="text-sm text-slate-500">Horário na capital</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_time"]</p>
                         <p class="text-xl font-bold"><span id="local-time">—</span><small id="time-zone" class="block text-sm font-normal"></small></p>
                     </div>
                 </div>
@@ -118,9 +158,9 @@
                 <div class="bg-slate-50 rounded-xl p-6 border border-slate-100 flex items-center gap-4">
                     <i class="fas fa-exchange-alt text-3xl text-green-500"></i>
                     <div>
-                        <p class="text-sm text-slate-500">Conversor de moeda</p>
+                        <p class="text-sm text-slate-500">@Localizer["label_currency"]</p>
                         <p class="font-bold"><span id="currency-rate">—</span></p>
-                        <label for="currency-amount" class="block text-sm mt-2">Valor em reais (BRL)</label>
+                        <label for="currency-amount" class="block text-sm mt-2">@Localizer["label_currency_value"]</label>
                         <input id="currency-amount" type="number" min="0" step="0.01" value="1" class="w-full border rounded p-2" />
                         <output id="currency-result" for="currency-amount" class="block text-sm mt-2"></output>
                     </div>
@@ -131,26 +171,33 @@
         <section id="country-news" class="news-section" aria-labelledby="news-heading" aria-busy="false">
             <div class="news-section-heading">
                 <div>
-                    <p class="news-eyebrow"><span></span> DIÁRIO DO MUNDO</p>
-                    <h2 id="news-heading">Notícias do país</h2>
-                    <p id="news-context" class="news-context">As manchetes acompanham o país que você pesquisar.</p>
+                    <p class="news-eyebrow"><span></span> @Localizer["news_eyebrow"]</p>
+                    <h2 id="news-heading">@Localizer["news_title_default"]</h2>
+                    <p id="news-context" class="news-context">@Localizer["news_context_default"]</p>
                 </div>
                 <span id="news-count" class="news-count" hidden></span>
             </div>
             <div id="news-list" class="news-grid"></div>
         </section>
-        <section id="como-funciona" class="mt-8 text-sm text-slate-500">
-            <h2 class="font-bold">Como funciona</h2>
-            <p>Busque um país em português ou inglês. Os dados gerais vêm da REST Countries API v5, quando configurada. Se o serviço estiver indisponível, o painel identifica o uso da base local de referência. Consulte também clima e horário da capital, conversão de reais (BRL) para a moeda do país e notícias relacionadas ao país. Cada serviço pode ter disponibilidade e frequência de atualização diferentes.</p>
-        </section>
     </main>
 
     <!-- Rodapé -->
     <footer class="bg-[#001f3f] text-center text-slate-400 py-6 text-sm">
-        <i class="fas fa-globe mr-2"></i> Planet Overview — explore, compare e planeje
+        <i class="fas fa-globe mr-2"></i> <span>@Localizer["footer_text"]</span>
     </footer>
 
-
+    <script>
+        window.AppTranslations = {
+            buscando: '@Localizer["status_searching"]',
+            visaoGeral: '@Localizer["overview_title"]',
+            aguardando: '@Localizer["status_waiting"]',
+            botaoBuscar: '@Localizer["search_btn"]',
+            statusBuscando: '@Localizer["status_searching_details"]',
+            emPauta: '@Localizer["news_em_pauta"]',
+            consultado: '@Localizer["status_consultado"]',
+            reportagens: '@Localizer["news_reportagens"]'
+        };
+    </script>
     <script src="~/js/site.js" asp-append-version="true" defer></script>
 </body>
 </html>

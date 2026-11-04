@@ -64,7 +64,7 @@
             if (!matches.length) {
                 const empty = document.createElement('div');
                 empty.className = 'country-no-results';
-                empty.textContent = 'Nenhum país encontrado. Confira o nome digitado.';
+                empty.textContent = 'Nenhum país encontrado.';
                 empty.setAttribute('role', 'presentation');
                 options.append(empty);
             }
@@ -89,9 +89,9 @@
             });
             options.hidden = false;
             countryInput.setAttribute('aria-expanded', 'true');
-            text('country-suggestion-status', matches.length ? `${matches.length} sugestões. Use as setas e Enter para selecionar.` : 'Nenhum país encontrado.');
+            text('country-suggestion-status', matches.length ? `${matches.length} sugestões.` : 'Nenhum país encontrado.');
         } catch {
-            if (version === suggestionVersion) closeSuggestions(); // Manual search remains available.
+            if (version === suggestionVersion) closeSuggestions();
         }
     }
 
@@ -177,9 +177,10 @@
     function renderNews(news) {
         const container = byId('news-list');
         container.replaceChildren();
-        const countryName = news.countryName || 'País pesquisado';
-        text('news-heading', `${countryName} em pauta`);
-        text('news-context', 'Manchetes em português sobre o país pesquisado, das mais recentes às mais antigas.');
+        const countryName = news.countryName || 'País';
+        
+        text('news-heading', `${countryName} ${window.AppTranslations.emPauta}`);
+        
         for (const article of news.articles || []) {
             const url = safeUrl(article.url);
             if (!url || !article.title || article.title === '[Removed]') continue;
@@ -201,7 +202,7 @@
             const imageUrl = safeUrl(article.urlToImage);
             if (imageUrl) {
                 const image = document.createElement('img');
-                image.alt = ''; // The adjacent headline names the same link.
+                image.alt = '';
                 image.loading = 'lazy';
                 image.decoding = 'async';
                 image.referrerPolicy = 'no-referrer';
@@ -240,7 +241,7 @@
             const read = document.createElement('div');
             read.className = 'news-read';
             const label = document.createElement('span');
-            label.textContent = 'Ler reportagem';
+            label.textContent = 'Ler';
             const arrow = newsIcon('M6 18 18 6 M6 6h12v12');
             read.append(label, arrow);
             content.append(meta, heading, description, read);
@@ -251,10 +252,10 @@
         const count = container.childElementCount;
         byId('country-news').setAttribute('aria-busy', 'false');
         if (count) {
-            text('news-count', `${count} ${count === 1 ? 'reportagem' : 'reportagens'}`);
+            text('news-count', `${window.AppTranslations.reportagens} ${count}`);
             byId('news-count').hidden = false;
         } else {
-            newsMessage('Nenhuma manchete encontrada', `Ainda não há notícias em português com o nome de ${countryName} no título. Tente novamente mais tarde.`);
+            newsMessage('Nenhuma manchete', `Não há notícias disponíveis.`);
         }
     }
 
@@ -270,29 +271,30 @@
         exchangeRate = undefined;
         currency = undefined;
         newsLoading();
-        text('news-heading', 'Notícias do país');
-        text('news-context', 'Consultando as manchetes do país pesquisado…');
+        
+        text('news-heading', window.AppTranslations.buscando + '...');
         byId('country-flag').hidden = true;
-        for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate']) text(id, 'Carregando…');
+        for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate']) text(id, '—');
         for (const id of ['weather-description', 'time-zone', 'currency-result']) text(id, '');
         text('country-source', '');
-        text('country-title', `Buscando ${query}`);
-        text('updated-at', 'Consultando');
-        text('search-status', 'Buscando informações do país…');
+        text('country-title', `${window.AppTranslations.buscando} ${query}...`);
+        text('updated-at', window.AppTranslations.aguardando);
+        text('search-status', window.AppTranslations.statusBuscando);
         byId('overview').setAttribute('aria-busy', 'true');
-        byId('search-button').textContent = 'Buscando…';
+        byId('search-button').textContent = window.AppTranslations.buscando + '...';
+        
         try {
             const country = await api(`/api/country/${encodeURIComponent(query)}`, signal);
             if (signal.aborted) return;
-            text('country-title', `Visão geral: ${country.countryName || country.country}`);
-            text('news-heading', `${country.countryName || country.country} em pauta`);
-            text('country-source', `${country.dataSource} · dados gerais de referência`);
-            text('capital', country.capital || 'Sem capital informada');
-            text('language', country.language || 'Não informado');
+            text('country-title', `${window.AppTranslations.visaoGeral}: ${country.countryName || country.country}`);
+            text('news-heading', `${country.countryName || country.country} ${window.AppTranslations.emPauta}`);
+            text('country-source', `${country.dataSource}`);
+            text('capital', country.capital || '—');
+            text('language', country.language || '—');
             text('population', Number(country.population).toLocaleString('pt-BR'));
             const flag = safeUrl(country.flagUrl);
             if (flag) { byId('country-flag').src = flag; byId('country-flag').hidden = false; }
-            text('search-status', 'Dados gerais carregados. Consultando os demais serviços…');
+            text('search-status', 'Dados carregados.');
 
             let unavailable = 0;
             async function card(action, fallback) {
@@ -306,7 +308,7 @@
                     if (signal.aborted) return;
                     text('weather', `${Number(weather.temp).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} °C`);
                     text('weather-description', weather.description);
-                }, () => text('weather', 'Clima indisponível')),
+                }, () => text('weather', '—')),
                 card(async () => {
                     const coordinates = country.capitalCoordinates;
                     if (!coordinates || coordinates.length < 2) throw new Error('No coordinates');
@@ -315,15 +317,13 @@
                     const formatter = new Intl.DateTimeFormat('pt-BR', { timeZone: time.timeZone, hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     const initialTime = Date.parse(`${time.localDateTime}Z`);
                     if (!Number.isFinite(initialTime)) throw new Error('Invalid time');
-                    // TimeAPI returns a wall-clock value without an offset. Advance it in UTC
-                    // to avoid interpreting that value in the browser's own timezone.
                     const started = performance.now();
                     const wallClock = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     const tick = () => text('local-time', wallClock.format(new Date(initialTime + performance.now() - started)));
-                    formatter.format(new Date()); // Validate the provider's IANA timezone.
+                    formatter.format(new Date()); 
                     tick(); clock = setInterval(tick, 1000);
                     text('time-zone', time.timeZone);
-                }, () => text('local-time', 'Horário indisponível')),
+                }, () => text('local-time', '—')),
                 card(async () => {
                     if (!country.currencyCode) throw new Error('No currency');
                     const rate = await api(`/api/currency/${encodeURIComponent(country.currencyCode)}`, signal);
@@ -332,31 +332,27 @@
                     currency = rate.targetCurrency; exchangeRate = rate.exchangeRate;
                     text('currency-rate', `1 ${rate.baseCurrency} = ${exchangeRate.toLocaleString('pt-BR', { maximumFractionDigits: 4 })} ${currency}`);
                     convert();
-                }, () => text('currency-rate', 'Câmbio indisponível')),
+                }, () => text('currency-rate', '—')),
                 card(async () => {
                     const news = await api(`/api/news/${encodeURIComponent(country.countryCode)}`, signal);
                     if (!signal.aborted) renderNews(news);
                 }, () => {
-                    text('news-context', 'Não foi possível atualizar as manchetes desta consulta.');
-                    newsMessage('As notícias estão indisponíveis', 'Tente buscar o país novamente em alguns instantes.');
+                    newsMessage('Erro', 'As notícias estão indisponíveis.');
                 })
             ]);
             if (signal.aborted) return;
-            text('updated-at', `Consultado às ${new Date().toLocaleTimeString('pt-BR')}`);
-            text('search-status', unavailable ? `Consulta concluída. ${unavailable} serviço(s) indisponível(is); tente novamente mais tarde.` : 'Consulta concluída.');
+            text('updated-at', `${window.AppTranslations.consultado} ${new Date().toLocaleTimeString('pt-BR')}`);
+            text('search-status', '');
         } catch (error) {
             if (signal.aborted) return;
-            text('search-status', error.message === '404' ? 'País não encontrado ou serviço indisponível. Confira o nome e tente novamente.' : 'Não foi possível consultar o país. Tente novamente.');
+            text('search-status', 'Erro na consulta.');
             text('country-title', 'Nenhum país carregado');
-            text('news-heading', 'Notícias do país');
-            text('news-context', 'As manchetes acompanham o país que você pesquisar.');
-            newsMessage('Escolha um país para explorar', 'Confira o nome digitado e faça uma nova busca.');
-            text('updated-at', 'Consulta não concluída');
-            for (const id of ['capital', 'language', 'population', 'weather', 'local-time', 'currency-rate']) text(id, '—');
+            newsMessage('Erro', 'Não foi possível carregar as informações.');
+            text('updated-at', '—');
         } finally {
             if (!signal.aborted) {
                 byId('overview').setAttribute('aria-busy', 'false');
-                byId('search-button').textContent = 'Buscar país';
+                byId('search-button').textContent = window.AppTranslations.botaoBuscar;
             }
         }
     }
@@ -364,3 +360,21 @@
     byId('currency-amount').addEventListener('input', convert);
     search();
 })();
+
+document.addEventListener("DOMContentLoaded", () => {
+    const themeToggle = document.getElementById("theme-toggle");
+    const currentTheme = localStorage.getItem("theme") || "light";
+    document.documentElement.setAttribute("data-theme", currentTheme);
+    
+    if(themeToggle) {
+        themeToggle.innerHTML = currentTheme === "dark" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        
+        themeToggle.addEventListener("click", () => {
+            const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+            const newTheme = isDark ? "light" : "dark";
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
+            themeToggle.innerHTML = newTheme === "dark" ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+        });
+    }
+});

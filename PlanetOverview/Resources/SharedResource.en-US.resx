@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="nav_home" xml:space="preserve">
+    <value>Home</value>
+  </data>
+  <data name="nav_how_it_works" xml:space="preserve">
+    <value>How it works</value>
+  </data>
+  <data name="hero_title" xml:space="preserve">
+    <value>Discover the world in one place</value>
+  </data>
+  <data name="hero_desc" xml:space="preserve">
+    <value>Search any country and see updated information on a single screen.</value>
+  </data>
+  <data name="search_placeholder" xml:space="preserve">
+    <value>Type or select a country...</value>
+  </data>
+  <data name="search_btn" xml:space="preserve">
+    <value>Search country</value>
+  </data>
+  <data name="realtime_status" xml:space="preserve">
+    <value>Real-time API query</value>
+  </data>
+  <data name="overview_title" xml:space="preserve">
+    <value>Overview</value>
+  </data>
+  <data name="status_waiting" xml:space="preserve">
+    <value>Waiting for query</value>
+  </data>
+  <data name="label_capital" xml:space="preserve">
+    <value>Capital:</value>
+  </data>
+  <data name="label_language" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="label_population" xml:space="preserve">
+    <value>Population</value>
+  </data>
+  <data name="label_weather" xml:space="preserve">
+    <value>Current Weather</value>
+  </data>
+  <data name="label_time" xml:space="preserve">
+    <value>Capital Time</value>
+  </data>
+  <data name="label_currency" xml:space="preserve">
+    <value>Currency Converter</value>
+  </data>
+  <data name="label_currency_value" xml:space="preserve">
+    <value>Value in Reais (BRL)</value>
+  </data>
+  <data name="news_eyebrow" xml:space="preserve">
+    <value>WORLD DIARY</value>
+  </data>
+  <data name="news_title_default" xml:space="preserve">
+    <value>Country News</value>
+  </data>
+  <data name="news_context_default" xml:space="preserve">
+    <value>Headlines follow the country you search for.</value>
+  </data>
+  <data name="footer_text" xml:space="preserve">
+    <value>Planet Overview — essential information of any country, in one place.</value>
+  </data>
+  <data name="status_searching" xml:space="preserve">
+    <value>Searching</value>
+  </data>
+  <data name="status_searching_details" xml:space="preserve">
+    <value>Searching for country information...</value>
+  </data>
+  <data name="news_em_pauta" xml:space="preserve">
+    <value>in focus</value>
+  </data>
+  <data name="status_consultado" xml:space="preserve">
+    <value>Queried at</value>
+  </data>
+  <data name="news_reportagens" xml:space="preserve">
+    <value>Reports:</value>
+  </data>
+  <data name="how_it_works_title" xml:space="preserve">
+    <value>How Planet Overview works</value>
+  </data>
+  <data name="how_it_works_desc" xml:space="preserve">
+    <value>Four steps to get a complete overview of any country.</value>
+  </data>
+  <data name="step1_title" xml:space="preserve">
+    <value>Search a country</value>
+  </data>
+  <data name="step1_desc" xml:space="preserve">
+    <value>Type the country name or choose from the alphabetical list or interactive map.</value>
+  </data>
+  <data name="step2_title" xml:space="preserve">
+    <value>See the overview</value>
+  </data>
+  <data name="step2_desc" xml:space="preserve">
+    <value>Five consolidated blocks: general data, weather, time zone, currency, and news.</value>
+  </data>
+  <data name="step3_title" xml:space="preserve">
+    <value>Customize</value>
+  </data>
+  <data name="step3_desc" xml:space="preserve">
+    <value>Change the interface language, light/dark theme, and currency used for conversion.</value>
+  </data>
+  <data name="step4_title" xml:space="preserve">
+    <value>Consult again</value>
+  </data>
+  <data name="step4_desc" xml:space="preserve">
+    <value>Quickly revisit countries already searched during your session.</value>
+  </data>
+  <data name="cta_title" xml:space="preserve">
+    <value>Ready to start?</value>
+  </data>
+  <data name="cta_desc" xml:space="preserve">
+    <value>No registration required — immediate query access.</value>
+  </data>
+  <data name="cta_btn" xml:space="preserve">
+    <value>Go to search</value>
+  </data>
+</root>
