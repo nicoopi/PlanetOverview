@@ -1,0 +1,76 @@
+@baseUrl = http://localhost:5049
+@csrf = substitua-pelo-token
+
+### Antes de cada escrita, obtenha token e copie para @csrf; preserve cookies.
+# Obtenha novo token após cadastro, login ou logout.
+GET {{baseUrl}}/api/account/csrf
+
+### CREATE: cadastro e início de sessão
+POST {{baseUrl}}/api/account/register
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "name": "Explorador",
+  "email": "explorador@example.com",
+  "password": "MinhaSenha123"
+}
+
+### Login
+POST {{baseUrl}}/api/account/login
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "email": "explorador@example.com",
+  "password": "MinhaSenha123"
+}
+
+### READ: consultar o próprio perfil
+GET {{baseUrl}}/api/account/me
+
+### UPDATE: atualizar o próprio perfil
+PUT {{baseUrl}}/api/account/me
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "name": "Novo nome",
+  "email": "explorador@example.com",
+  "currentPassword": "MinhaSenha123",
+  "newPassword": null
+}
+
+### Sair
+POST {{baseUrl}}/api/account/logout
+X-CSRF-TOKEN: {{csrf}}
+
+### DELETE: excluir a própria conta (exige login)
+DELETE {{baseUrl}}/api/account/me
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "currentPassword": "MinhaSenha123"
+}
+
+
+### Gerar código de recuperação (autenticado; guarde a resposta)
+POST {{baseUrl}}/api/account/recovery-code
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "currentPassword": "MinhaSenha123"
+}
+
+### Recuperar acesso sem e-mail (código é de uso único)
+POST {{baseUrl}}/api/account/forgot-password
+Content-Type: application/json
+X-CSRF-TOKEN: {{csrf}}
+
+{
+  "email": "explorador@example.com",
+  "recoveryCode": "COLE-O-CODIGO-GUARDADO",
+  "newPassword": "NovaSenha456"
+}

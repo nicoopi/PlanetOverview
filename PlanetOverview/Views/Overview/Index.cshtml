@@ -22,6 +22,7 @@
         <div class="flex items-center gap-2 text-xl font-bold">
             <i class="fas fa-globe"></i> Planet Overview
         </div>
+        <a href="@(User.Identity?.IsAuthenticated == true ? "/account/profile" : "/account/login")" class="text-sm text-white border border-slate-500 rounded px-3 py-2 shrink-0 ml-auto mr-4">@Localizer[User.Identity?.IsAuthenticated == true ? "account_profile_entry" : "account_login"]</a>
         <div class="gap-6 text-sm hidden md:flex items-center">
             <a asp-controller="Overview" asp-action="Index" class="border-b-2 border-white pb-1">@Localizer["nav_home"]</a>
             <a asp-controller="Overview" asp-action="ComoFunciona" class="text-slate-300 hover:text-white">@Localizer["nav_how_it_works"]</a>

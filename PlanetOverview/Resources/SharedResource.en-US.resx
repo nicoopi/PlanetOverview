@@ -114,4 +114,62 @@
   <data name="cta_btn" xml:space="preserve">
     <value>Go to search</value>
   </data>
+  <data name="account_profile_title" xml:space="preserve"><value>My account</value></data>
+  <data name="account_register_title" xml:space="preserve"><value>Create your account</value></data>
+  <data name="account_login_title" xml:space="preserve"><value>Welcome back</value></data>
+  <data name="account_back" xml:space="preserve"><value>Back to explore →</value></data>
+  <data name="account_eyebrow" xml:space="preserve"><value>YOUR ACCOUNT · PLANET OVERVIEW</value></data>
+  <data name="account_profile_desc" xml:space="preserve"><value>View and update your account details.</value></data>
+  <data name="account_register_desc" xml:space="preserve"><value>Create your own account on Planet Overview.</value></data>
+  <data name="account_login_desc" xml:space="preserve"><value>Sign in with your email and password.</value></data>
+  <data name="account_name" xml:space="preserve"><value>Name</value></data>
+  <data name="account_email" xml:space="preserve"><value>Email</value></data>
+  <data name="account_password" xml:space="preserve"><value>Password</value></data>
+  <data name="account_current_password" xml:space="preserve"><value>Current password (to confirm changes)</value></data>
+  <data name="account_password_help" xml:space="preserve"><value>Use 8 to 128 characters, with an uppercase letter, a lowercase letter and a number.</value></data>
+  <data name="account_confirm_password" xml:space="preserve"><value>Confirm password</value></data>
+  <data name="account_new_password" xml:space="preserve"><value>New password (optional)</value></data>
+  <data name="account_new_password_help" xml:space="preserve"><value>Leave blank to keep your password. To change it, use uppercase, lowercase and a number.</value></data>
+  <data name="account_save" xml:space="preserve"><value>Save changes</value></data>
+  <data name="account_register" xml:space="preserve"><value>Create account</value></data>
+  <data name="account_login" xml:space="preserve"><value>Sign in</value></data>
+  <data name="account_logout" xml:space="preserve"><value>Sign out</value></data>
+  <data name="account_delete" xml:space="preserve"><value>Delete my account</value></data>
+  <data name="account_delete_warning" xml:space="preserve"><value>Deletion is permanent. Confirm your password to continue.</value></data>
+  <data name="account_delete_password" xml:space="preserve"><value>Current password</value></data>
+  <data name="account_delete_button" xml:space="preserve"><value>Permanently delete account</value></data>
+  <data name="account_has_account" xml:space="preserve"><value>Already have an account?</value></data>
+  <data name="account_no_account" xml:space="preserve"><value>New here?</value></data>
+  <data name="account_language" xml:space="preserve"><value>Language</value></data>
+  <data name="account_theme" xml:space="preserve"><value>Toggle theme</value></data>
+  <data name="account_error_request" xml:space="preserve"><value>Could not start the request. Reload the page.</value></data>
+  <data name="account_error_rate" xml:space="preserve"><value>Too many attempts. Wait one minute before trying again.</value></data>
+  <data name="account_error_session" xml:space="preserve"><value>Your session expired. Sign in again.</value></data>
+  <data name="account_error_generic" xml:space="preserve"><value>Could not complete the request. Check your details and try again.</value></data>
+  <data name="account_error_connection" xml:space="preserve"><value>Connection failed. Try again.</value></data>
+  <data name="account_error_match" xml:space="preserve"><value>Passwords do not match.</value></data>
+  <data name="account_saved" xml:space="preserve"><value>Account updated successfully.</value></data>
+  <data name="account_error_load" xml:space="preserve"><value>Could not load the profile. Reload the page.</value></data>
+  <data name="account_confirm_delete" xml:space="preserve"><value>Permanently delete your account? This cannot be undone.</value></data>
+  <data name="account_error_name" xml:space="preserve"><value>Enter a name with at least two characters.</value></data>
+  <data name="account_error_duplicate" xml:space="preserve"><value>This email is already registered.</value></data>
+  <data name="account_error_login" xml:space="preserve"><value>Incorrect email or password, or access temporarily locked.</value></data>
+  <data name="account_error_password" xml:space="preserve"><value>The current password is incorrect.</value></data>
+  <data name="account_error_save" xml:space="preserve"><value>Could not save the account.</value></data>
+  <data name="account_error_details" xml:space="preserve"><value>Check your details. Passwords must have 8 to 128 characters, with uppercase, lowercase and a number.</value></data>
+  <data name="account_explore" xml:space="preserve"><value>Go to the site</value></data>
+  <data name="account_forgot" xml:space="preserve"><value>Forgot password</value></data>
+  <data name="account_forgot_title" xml:space="preserve"><value>Recover your account</value></data>
+  <data name="account_forgot_desc" xml:space="preserve"><value>Use your saved recovery code to set a new password.</value></data>
+  <data name="account_recovery_code" xml:space="preserve"><value>Recovery code</value></data>
+  <data name="account_recovery_intro" xml:space="preserve"><value>Generate and store your code safely. It lets you recover your account without email.</value></data>
+  <data name="account_generate_code" xml:space="preserve"><value>Generate recovery code</value></data>
+  <data name="account_code_warning" xml:space="preserve"><value>Save this code now. It is only shown here and can be used once. Generating another replaces the previous code.</value></data>
+  <data name="account_code_generated" xml:space="preserve"><value>Code generated. Store it safely.</value></data>
+  <data name="account_reset_submit" xml:space="preserve"><value>Reset password</value></data>
+  <data name="account_reset_done" xml:space="preserve"><value>Password reset. Sign in with your new password. Generate another recovery code in your profile.</value></data>
+  <data name="account_new_password_label" xml:space="preserve"><value>New password</value></data>
+  <data name="account_error_recovery" xml:space="preserve"><value>Invalid email or recovery code.</value></data>
+  <data name="account_profile_entry" xml:space="preserve"><value>Go to my profile</value></data>
+  <data name="account_recovery_help" xml:space="preserve"><value>No recovery code? Generate one from your profile while you still have access to your account.</value></data>
 </root>

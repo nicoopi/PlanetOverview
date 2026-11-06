@@ -114,4 +114,62 @@
   <data name="cta_btn" xml:space="preserve">
     <value>Ir para a busca</value>
   </data>
+  <data name="account_profile_title" xml:space="preserve"><value>Minha conta</value></data>
+  <data name="account_register_title" xml:space="preserve"><value>Crie sua conta</value></data>
+  <data name="account_login_title" xml:space="preserve"><value>Bem-vindo de volta</value></data>
+  <data name="account_back" xml:space="preserve"><value>Voltar a explorar →</value></data>
+  <data name="account_eyebrow" xml:space="preserve"><value>SUA CONTA · PLANET OVERVIEW</value></data>
+  <data name="account_profile_desc" xml:space="preserve"><value>Consulte e atualize seus dados de acesso.</value></data>
+  <data name="account_register_desc" xml:space="preserve"><value>Cadastre-se para ter seu próprio acesso ao Planet Overview.</value></data>
+  <data name="account_login_desc" xml:space="preserve"><value>Entre com seu e-mail e senha para acessar sua conta.</value></data>
+  <data name="account_name" xml:space="preserve"><value>Nome</value></data>
+  <data name="account_email" xml:space="preserve"><value>E-mail</value></data>
+  <data name="account_password" xml:space="preserve"><value>Senha</value></data>
+  <data name="account_current_password" xml:space="preserve"><value>Senha atual (para confirmar as alterações)</value></data>
+  <data name="account_password_help" xml:space="preserve"><value>Use de 8 a 128 caracteres, com maiúscula, minúscula e número.</value></data>
+  <data name="account_confirm_password" xml:space="preserve"><value>Confirme a senha</value></data>
+  <data name="account_new_password" xml:space="preserve"><value>Nova senha (opcional)</value></data>
+  <data name="account_new_password_help" xml:space="preserve"><value>Deixe vazio para manter a senha. Para trocar, use maiúscula, minúscula e número.</value></data>
+  <data name="account_save" xml:space="preserve"><value>Salvar alterações</value></data>
+  <data name="account_register" xml:space="preserve"><value>Criar conta</value></data>
+  <data name="account_login" xml:space="preserve"><value>Entrar</value></data>
+  <data name="account_logout" xml:space="preserve"><value>Sair da conta</value></data>
+  <data name="account_delete" xml:space="preserve"><value>Excluir minha conta</value></data>
+  <data name="account_delete_warning" xml:space="preserve"><value>A exclusão é permanente. Confirme sua senha para continuar.</value></data>
+  <data name="account_delete_password" xml:space="preserve"><value>Senha atual</value></data>
+  <data name="account_delete_button" xml:space="preserve"><value>Excluir conta permanentemente</value></data>
+  <data name="account_has_account" xml:space="preserve"><value>Já tem uma conta?</value></data>
+  <data name="account_no_account" xml:space="preserve"><value>Ainda não tem uma conta?</value></data>
+  <data name="account_language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="account_theme" xml:space="preserve"><value>Alternar tema</value></data>
+  <data name="account_error_request" xml:space="preserve"><value>Não foi possível iniciar a solicitação. Recarregue a página.</value></data>
+  <data name="account_error_rate" xml:space="preserve"><value>Muitas tentativas. Aguarde um minuto antes de tentar novamente.</value></data>
+  <data name="account_error_session" xml:space="preserve"><value>Sua sessão expirou. Entre novamente.</value></data>
+  <data name="account_error_generic" xml:space="preserve"><value>Não foi possível concluir. Verifique os dados e tente novamente.</value></data>
+  <data name="account_error_connection" xml:space="preserve"><value>Falha de conexão. Tente novamente.</value></data>
+  <data name="account_error_match" xml:space="preserve"><value>As senhas não conferem.</value></data>
+  <data name="account_saved" xml:space="preserve"><value>Dados atualizados com sucesso.</value></data>
+  <data name="account_error_load" xml:space="preserve"><value>Não foi possível carregar o perfil. Recarregue a página.</value></data>
+  <data name="account_confirm_delete" xml:space="preserve"><value>Excluir sua conta permanentemente? Esta ação não pode ser desfeita.</value></data>
+  <data name="account_error_name" xml:space="preserve"><value>Informe um nome com pelo menos dois caracteres.</value></data>
+  <data name="account_error_duplicate" xml:space="preserve"><value>Este e-mail já está cadastrado.</value></data>
+  <data name="account_error_login" xml:space="preserve"><value>E-mail ou senha incorretos, ou acesso temporariamente bloqueado.</value></data>
+  <data name="account_error_password" xml:space="preserve"><value>A senha atual está incorreta.</value></data>
+  <data name="account_error_save" xml:space="preserve"><value>Não foi possível salvar a conta.</value></data>
+  <data name="account_error_details" xml:space="preserve"><value>Verifique os dados. A senha deve ter de 8 a 128 caracteres, com maiúscula, minúscula e número.</value></data>
+  <data name="account_explore" xml:space="preserve"><value>Ir para o site</value></data>
+  <data name="account_forgot" xml:space="preserve"><value>Esqueci minha senha</value></data>
+  <data name="account_forgot_title" xml:space="preserve"><value>Recuperar acesso</value></data>
+  <data name="account_forgot_desc" xml:space="preserve"><value>Use o código de recuperação que você guardou para definir uma nova senha.</value></data>
+  <data name="account_recovery_code" xml:space="preserve"><value>Código de recuperação</value></data>
+  <data name="account_recovery_intro" xml:space="preserve"><value>Gere e guarde seu código em um lugar seguro. Ele permite recuperar sua conta sem receber e-mail.</value></data>
+  <data name="account_generate_code" xml:space="preserve"><value>Gerar código de recuperação</value></data>
+  <data name="account_code_warning" xml:space="preserve"><value>Guarde este código agora. Ele só aparece nesta tela e pode ser usado uma única vez. Gerar outro invalida o anterior.</value></data>
+  <data name="account_code_generated" xml:space="preserve"><value>Código gerado. Guarde-o em um lugar seguro.</value></data>
+  <data name="account_reset_submit" xml:space="preserve"><value>Redefinir senha</value></data>
+  <data name="account_reset_done" xml:space="preserve"><value>Senha redefinida. Entre com sua nova senha. Você precisará gerar outro código no perfil.</value></data>
+  <data name="account_new_password_label" xml:space="preserve"><value>Nova senha</value></data>
+  <data name="account_error_recovery" xml:space="preserve"><value>E-mail ou código de recuperação inválido.</value></data>
+  <data name="account_profile_entry" xml:space="preserve"><value>Entrar no meu perfil</value></data>
+  <data name="account_recovery_help" xml:space="preserve"><value>Ainda não tem um código? Ele deve ser gerado no perfil enquanto você tem acesso à conta.</value></data>
 </root>

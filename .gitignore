@@ -3,3 +3,6 @@ obj/
 .vs/
 **/appsettings*.json
 !**/appsettings.example.json
+
+**/App_Data/
+__pycache__/

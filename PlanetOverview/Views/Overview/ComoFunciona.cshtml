@@ -21,6 +21,7 @@
         <div class="flex items-center gap-2 text-xl font-bold">
             <i class="fas fa-globe"></i> Planet Overview
         </div>
+        <a href="@(User.Identity?.IsAuthenticated == true ? "/account/profile" : "/account/login")" class="text-sm text-white border border-slate-500 rounded px-3 py-2 shrink-0 ml-auto mr-4">@Localizer[User.Identity?.IsAuthenticated == true ? "account_profile_entry" : "account_login"]</a>
         <div class="flex items-center">
             <form id="lang-form" asp-controller="Overview" asp-action="MudarIdioma" method="post" class="mr-4">
                 <input type="hidden" name="returnUrl" value="@Context.Request.Path" />

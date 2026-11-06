@@ -71,6 +71,8 @@ PlanetOverview/
 ├── PlanetOverview.csproj
 ├── Program.cs
 └── README.md
+```
+
 ## Executar localmente
 
 Requer o SDK .NET 8. No PowerShell, na raiz do projeto:
@@ -149,3 +151,85 @@ Veja a origem, revisão e licença em
 Clima, câmbio, notícias e horário usam os serviços online. A disponibilidade e a
 frequência de atualização dependem do plano e das condições de cada provedor.
 O estilo atual ainda carrega Tailwind e Font Awesome por CDN.
+
+
+### API interna: contas de usuários e login
+
+O CRUD interno agora gerencia contas. Na página principal, clique em **Entrar**.
+As telas estão em `/account/register`, `/account/login` e `/account/profile`.
+Cada pessoa pode consultar, editar e excluir somente a própria conta.
+Após cadastro ou login, o usuário é levado à página principal. A edição fica
+em Minha conta, com um botão Ir para o site para retornar à exploração.
+
+| Operação | Método e endpoint | Comportamento |
+| --- | --- | --- |
+| Create | `POST /api/account/register` | Cadastra nome, e-mail e senha; retorna 201 e inicia sessão |
+| Read | `GET /api/account/me` | Retorna o próprio perfil |
+| Update | `PUT /api/account/me` | Atualiza nome/e-mail e, opcionalmente, senha |
+| Delete | `DELETE /api/account/me` | Exclui a própria conta e encerra a sessão |
+| Login | `POST /api/account/login` | Valida e-mail/senha e inicia sessão |
+| Logout | `POST /api/account/logout` | Encerra a sessão atual |
+| CSRF | `GET /api/account/csrf` | Retorna o token para uma operação de escrita |
+
+Cadastro recebe `name`, `email` e `password`; login recebe `email` e `password`.
+Atualização recebe `name`, `email`, `currentPassword` e `newPassword` opcional
+(omita ou envie null para manter a senha). Exclusão recebe `currentPassword`.
+O perfil retorna apenas `id`, `name`, `email` e `createdAt`, nunca senha ou hash.
+O nome aceita de 2 a 100 caracteres. A senha aceita de 8 a 128 caracteres e
+exige maiúscula, minúscula e número.
+
+A autenticação usa ASP.NET Core Identity, hash de senha e cookie HttpOnly
+(Secure em produção). O cookie não é persistente e o ticket dura 8 horas,
+com renovação durante o uso. Escritas exigem cookie e `X-CSRF-TOKEN`: consulte
+`/api/account/csrf` antes e preserve os cookies. Obtenha novo token após cadastro,
+login ou logout. As telas cuidam disso automaticamente.
+Exemplos estão em [PlanetOverview/PlanetOverview.http](PlanetOverview/PlanetOverview.http).
+
+Dados inválidos retornam 400; falta de autenticação ou login recusado, 401;
+e-mail duplicado, 409; excesso de tentativas, 429. Cadastro, login, atualização
+e exclusão compartilham limite de 10 tentativas por minuto por IP. Cinco senhas
+incorretas bloqueiam a autenticação da conta por cinco minutos. Atualizações
+invalidam outras sessões; exclusão invalida todas. Não existe listagem pública
+de usuários nem acesso ao perfil de outra pessoa.
+
+O SQLite é criado em `PlanetOverview/App_Data/accounts.db`, fora de `wwwroot`
+e ignorado pelo Git. Para outro arquivo, configure `ConnectionStrings__Accounts`
+com `Data Source=caminho/accounts.db` e crie previamente o diretório.
+O esquema inicial usa `EnsureCreated`; futuras alterações em bancos existentes
+precisam de migrations.
+
+O CRUD de países salvos foi substituído. Os bancos anteriores são preservados,
+mas não são usados pela nova API. A exploração de países continua pública;
+o login protege o perfil. A recuperação de senha usa um código de recuperação, sem envio de e-mail.
+A confirmação de e-mail não está incluída.
+
+Verificação (SDK .NET 8 e Python 3):
+
+```powershell
+dotnet build PlanetOverview/PlanetOverview.csproj
+python tests/test_account_api.py
+```
+
+Os testes usam bancos temporários e cobrem CRUD, login/logout, persistência,
+hash, cookies, CSRF, isolamento, invalidação de sessões, rollback e limites.
+Se necessário, substitua `dotnet` por
+`& "$env:LOCALAPPDATA/PlanetOverview/dotnet/dotnet.exe"`.
+
+### Esqueci minha senha (sem e-mail)
+
+No login, use **Esqueci minha senha** e informe e-mail, código de recuperação e
+nova senha. Gere e guarde o código previamente em **Entrar no meu perfil →
+Código de recuperação**, confirmando sua senha atual. O código é mostrado apenas
+na resposta de geração, fica armazenado como hash e vale uma única vez. Gerar
+outro invalida o anterior. Sem esse código, não é possível redefinir a senha
+apenas conhecendo o e-mail da conta.
+
+- `POST /api/account/recovery-code` (autenticado): recebe `currentPassword` e
+  devolve `recoveryCode`. Guarde o valor; ele não é retornado por `/me`.
+- `POST /api/account/forgot-password` (público, com proteção CSRF e limite de
+  tentativas): recebe `email`, `recoveryCode` e `newPassword`. Retorna 204,
+  consome o código e invalida as sessões existentes. Entre novamente com a nova
+  senha e gere outro código no perfil.
+
+O perfil permite editar os dados cadastrais e não mostra o campo de nova senha.
+O banco de contas existente é mantido: os códigos usam a tabela de tokens do Identity.

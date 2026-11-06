@@ -1,0 +1,116 @@
+@model string
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using System.Text.Json
+@inject IStringLocalizer<PlanetOverview.SharedResource> Localizer
+@{
+    Layout = null;
+    var profile = Model == "profile";
+    var register = Model == "register";
+    var forgot = Model == "forgot";
+    var title = Localizer[forgot ? "account_forgot_title" : profile ? "account_profile_title" : register ? "account_register_title" : "account_login_title"];
+    var clientKeys = new[] { "error_request", "error_rate", "error_session", "error_generic", "error_connection", "error_match", "saved", "error_load", "confirm_delete", "reset_done", "code_generated" };
+}
+<!DOCTYPE html>
+<html lang="@CultureInfo.CurrentUICulture.Name">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@title — Planet Overview</title>
+    <link rel="stylesheet" href="~/css/account.css" asp-append-version="true">
+    <script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'light'; } catch { }</script>
+    <script src="~/js/account.js" asp-append-version="true" defer></script>
+</head>
+<body data-account-mode="@Model">
+    <header class="site-header">
+        <div class="page-shell header-inner account-header">
+            <a href="/" class="brand">Planet Overview</a>
+            <div class="account-tools">
+                <a href="/" class="account-link">@Localizer["account_back"]</a>
+                <form asp-controller="Overview" asp-action="MudarIdioma" method="post">
+                    <input type="hidden" name="returnUrl" value="@Context.Request.Path">
+                    <select id="account-language" name="culture" aria-label="@Localizer["account_language"]">
+                        <option value="pt-BR" selected="@(CultureInfo.CurrentUICulture.Name == "pt-BR")">Português</option>
+                        <option value="en-US" selected="@(CultureInfo.CurrentUICulture.Name == "en-US")">English</option>
+                    </select>
+                </form>
+                <button id="account-theme" type="button" aria-label="@Localizer["account_theme"]">◐</button>
+            </div>
+        </div>
+    </header>
+    <main class="account-shell">
+        <section class="account-card" aria-labelledby="account-title">
+            <p class="account-eyebrow">@Localizer["account_eyebrow"]</p>
+            <h1 id="account-title">@title</h1>
+            <p class="account-description">@Localizer[forgot ? "account_forgot_desc" : profile ? "account_profile_desc" : register ? "account_register_desc" : "account_login_desc"]</p>
+            <p id="account-status" role="status" aria-live="polite" tabindex="-1"></p>
+            <form id="account-form">
+                <fieldset id="account-fields" disabled="@profile">
+                    @if (register || profile)
+                    {
+                        <label for="account-name">@Localizer["account_name"]</label>
+                        <input id="account-name" name="name" autocomplete="name" required minlength="2" maxlength="100">
+                    }
+                    <label for="account-email">@Localizer["account_email"]</label>
+                    <input id="account-email" name="email" type="email" autocomplete="email" required maxlength="254">
+                    @if (forgot)
+                    {
+                        <label for="recovery-code">@Localizer["account_recovery_code"]</label>
+                        <input id="recovery-code" autocomplete="off" required maxlength="64" spellcheck="false" aria-describedby="recovery-help">
+                        <p id="recovery-help" class="field-help">@Localizer["account_recovery_help"]</p>
+                    }
+                    <label for="account-password">@Localizer[forgot ? "account_new_password_label" : profile ? "account_current_password" : "account_password"]</label>
+                    <input id="account-password" name="password" type="password" autocomplete="@(register || forgot ? "new-password" : "current-password")" required minlength="@(register || forgot ? 8 : 1)" maxlength="128" aria-describedby="@(register || forgot ? "password-help" : null)">
+                    @if (register || forgot)
+                    {
+                        <p id="password-help" class="field-help">@Localizer["account_password_help"]</p>
+                        <label for="confirm-password">@Localizer["account_confirm_password"]</label>
+                        <input id="confirm-password" type="password" autocomplete="new-password" required minlength="8" maxlength="128">
+                    }
+                    <button class="primary-button account-submit" type="submit">@Localizer[forgot ? "account_reset_submit" : profile ? "account_save" : register ? "account_register" : "account_login"]</button>
+                </fieldset>
+            </form>
+            @if (profile)
+            {
+                <a href="/" class="secondary-button account-explore">@Localizer["account_explore"]</a>
+                <button id="logout-button" class="secondary-button" type="button">@Localizer["account_logout"]</button>
+                <details class="recovery-settings">
+                    <summary>@Localizer["account_recovery_code"]</summary>
+                    <p>@Localizer["account_recovery_intro"]</p>
+                    <form id="recovery-form">
+                        <label for="recovery-password">@Localizer["account_delete_password"]</label>
+                        <input id="recovery-password" type="password" autocomplete="current-password" required maxlength="128">
+                        <button class="secondary-button" type="submit">@Localizer["account_generate_code"]</button>
+                    </form>
+                    <div id="recovery-result" hidden>
+                        <p>@Localizer["account_code_warning"]</p>
+                        <output id="generated-code" aria-label="@Localizer["account_recovery_code"]"></output>
+                    </div>
+                </details>
+                <details class="delete-account">
+                    <summary>@Localizer["account_delete"]</summary>
+                    <p>@Localizer["account_delete_warning"]</p>
+                    <form id="delete-form">
+                        <label for="delete-password">@Localizer["account_delete_password"]</label>
+                        <input id="delete-password" type="password" autocomplete="current-password" required maxlength="128">
+                        <button class="danger-button" type="submit">@Localizer["account_delete_button"]</button>
+                    </form>
+                </details>
+            }
+            else if (forgot)
+            {
+                <p class="account-footer"><a href="/account/login">@Localizer["account_login"]</a></p>
+            }
+            else
+            {
+                @if (!register)
+                {
+                    <p class="forgot-link"><a href="/account/forgot-password">@Localizer["account_forgot"]</a></p>
+                }
+                <p class="account-footer">@Localizer[register ? "account_has_account" : "account_no_account"] <a href="@(register ? "/account/login" : "/account/register")">@Localizer[register ? "account_login" : "account_register"]</a></p>
+            }
+        </section>
+    </main>
+    <script id="account-translations" type="application/json">@Html.Raw(JsonSerializer.Serialize(clientKeys.ToDictionary(key => key, key => Localizer["account_" + key].Value)))</script>
+</body>
+</html>
