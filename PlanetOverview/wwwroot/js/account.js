@@ -5,10 +5,27 @@
     const status = document.getElementById('account-status');
     const form = document.getElementById('account-form');
     document.getElementById('account-language').addEventListener('change', event => event.target.form.requestSubmit());
-    document.getElementById('account-theme').addEventListener('click', () => {
+    const themeBtn = document.getElementById('account-theme');
+    const themeIcon = themeBtn.querySelector('i');
+
+    const updateThemeIcon = () => {
+        if (!themeIcon) return;
+        if (document.documentElement.dataset.theme === 'dark') {
+            themeIcon.classList.remove('fa-moon');
+            themeIcon.classList.add('fa-sun');
+        } else {
+            themeIcon.classList.remove('fa-sun');
+            themeIcon.classList.add('fa-moon');
+        }
+    };
+
+    updateThemeIcon(); // Ajusta o ícone ao carregar a página
+
+    themeBtn.addEventListener('click', () => {
         const theme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
         document.documentElement.dataset.theme = theme;
         try { localStorage.setItem('theme', theme); } catch { }
+        updateThemeIcon(); // Troca o ícone após o clique
     });
     const fields = document.getElementById('account-fields');
     const value = id => document.getElementById(id).value;

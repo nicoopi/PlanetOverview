@@ -17,6 +17,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@title — Planet Overview</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="~/css/account.css" asp-append-version="true">
     <script>try { document.documentElement.dataset.theme = localStorage.getItem('theme') || 'light'; } catch { }</script>
     <script src="~/js/account.js" asp-append-version="true" defer></script>
@@ -24,7 +25,8 @@
 <body data-account-mode="@Model">
     <header class="site-header">
         <div class="page-shell header-inner account-header">
-            <a href="/" class="brand">Planet Overview</a>
+            <!-- Ícone do globo adicionado aqui -->
+            <a href="/" class="brand"><i class="fas fa-globe"></i> Planet Overview</a>
             <div class="account-tools">
                 <a href="/" class="account-link">@Localizer["account_back"]</a>
                 <form asp-controller="Overview" asp-action="MudarIdioma" method="post">
@@ -34,7 +36,9 @@
                         <option value="en-US" selected="@(CultureInfo.CurrentUICulture.Name == "en-US")">English</option>
                     </select>
                 </form>
-                <button id="account-theme" type="button" aria-label="@Localizer["account_theme"]">◐</button>
+                <button id="account-theme" class="theme-btn" type="button" aria-label="@Localizer["account_theme"]">
+                    <i class="fas fa-moon"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -111,6 +115,9 @@
             }
         </section>
     </main>
+    <footer class="site-footer">
+        <i class="fas fa-globe"></i> <span>@Localizer["footer_text"]</span>
+    </footer>
     <script id="account-translations" type="application/json">@Html.Raw(JsonSerializer.Serialize(clientKeys.ToDictionary(key => key, key => Localizer["account_" + key].Value)))</script>
 </body>
 </html>
