@@ -4,5 +4,5 @@ namespace PlanetOverview.Services.Interfaces;
 
 public interface IWeatherService
 {
-    Task<WeatherOverview?> GetWeather(string capital);
+    Task<(bool Sucesso, WeatherOverview? Dados, string? MensagemErro)> GetWeather(string capital);
 }

@@ -25,14 +25,17 @@ namespace PlanetOverview.Controllers
                 return BadRequest("O nome da capital é obrigatório.");
             }
 
-            var weather = await _weatherService.GetWeather(capital);
+            // O retorno agora é uma tupla
+            var resultado = await _weatherService.GetWeather(capital);
             
-            if (weather == null)
+            if (!resultado.Sucesso)
             {
-                return NotFound($"Não foi possível encontrar o clima para {capital}.");
+                // Se falhou por falta de internet ou cidade inválida, devolve a mensagem exata do serviço
+                return StatusCode(503, new { erro = resultado.MensagemErro });
             }
 
-            return Ok(weather);
+            // Se deu sucesso, devolve os dados
+            return Ok(resultado.Dados);
         }
     }
 }

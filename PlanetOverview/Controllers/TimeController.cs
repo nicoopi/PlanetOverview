@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using PlanetOverview.Services.Interfaces;
 
 namespace PlanetOverview.Controllers;
@@ -19,31 +20,33 @@ public class TimeController : ControllerBase
     {
         if (!double.IsFinite(latitude) || !double.IsFinite(longitude) || latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180)
             return BadRequest("Coordenadas inválidas.");
-        var result = await _timeService.GetByCoordinatesAsync(latitude, longitude);
-        return result == null ? NotFound("Horário indisponível.") : Ok(result);
+            
+        var resultado = await _timeService.GetByCoordinatesAsync(latitude, longitude);
+        
+        if (!resultado.Sucesso)
+        {
+            // Oculta a complexidade do erro, enviando apenas a mensagem formatada para o JS
+            return StatusCode(503, new { erro = resultado.MensagemErro });
+        }
+        
+        return Ok(resultado.Dados);
     }
 
     [HttpGet]
-    public async Task<IActionResult> GetCurrentTime(
-        [FromQuery] string timeZone)
+    public async Task<IActionResult> GetCurrentTime([FromQuery] string timeZone)
     {
         if (string.IsNullOrWhiteSpace(timeZone))
         {
-            return BadRequest(
-                "O fuso horário é obrigatório. Exemplo: America/Sao_Paulo."
-            );
+            return BadRequest("O fuso horário é obrigatório. Exemplo: America/Sao_Paulo.");
         }
 
-        var result = await _timeService
-            .GetCurrentTimeAsync(timeZone);
+        var resultado = await _timeService.GetCurrentTimeAsync(timeZone);
 
-        if (result == null)
+        if (!resultado.Sucesso)
         {
-            return NotFound(
-                $"Não foi possível encontrar o fuso horário '{timeZone}'."
-            );
+            return StatusCode(503, new { erro = resultado.MensagemErro });
         }
 
-        return Ok(result);
+        return Ok(resultado.Dados);
     }
 }

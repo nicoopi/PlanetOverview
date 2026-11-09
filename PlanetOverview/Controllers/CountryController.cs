@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using PlanetOverview.Services.Interfaces;
 
 namespace PlanetOverview.Controllers;
@@ -18,8 +19,14 @@ public class CountryController : ControllerBase
     [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetCountries()
     {
-        var countries = await _countryService.GetCountries();
-        return countries == null ? StatusCode(503, "Serviço de países indisponível.") : Ok(countries);
+        var resultado = await _countryService.GetCountries();
+        
+        if (!resultado.Sucesso)
+        {
+            return StatusCode(503, new { erro = resultado.MensagemErro });
+        }
+        
+        return Ok(resultado.Dados);
     }
 
     [HttpGet("{country}")]
@@ -30,15 +37,13 @@ public class CountryController : ControllerBase
             return BadRequest("O país é obrigatório.");
         }
 
-        var result = await _countryService.GetCountry(country);
+        var resultado = await _countryService.GetCountry(country);
 
-        if (result == null)
+        if (!resultado.Sucesso)
         {
-            return NotFound(
-                $"Não foi possível encontrar o país '{country}'."
-            );
+            return StatusCode(404, new { erro = resultado.MensagemErro });
         }
 
-        return Ok(result);
+        return Ok(resultado.Dados);
     }
 }

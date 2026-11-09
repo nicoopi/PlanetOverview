@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using PlanetOverview.Services.Interfaces;
 
 namespace PlanetOverview.Controllers;
@@ -22,13 +23,13 @@ public class CurrencyController : ControllerBase
             return BadRequest("A moeda de destino é obrigatória (ex: BRL).");
         }
 
-        var currency = await _currencyService.GetExchangeRateAsync(targetCurrency);
+        var resultado = await _currencyService.GetExchangeRateAsync(targetCurrency);
 
-        if (currency == null)
+        if (!resultado.Sucesso)
         {
-            return NotFound($"Não foi possível encontrar a cotação para a moeda {targetCurrency}.");
+            return StatusCode(503, new { erro = resultado.MensagemErro });
         }
 
-        return Ok(currency);
+        return Ok(resultado.Dados);
     }
 }

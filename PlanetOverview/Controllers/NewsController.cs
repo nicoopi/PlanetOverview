@@ -1,4 +1,6 @@
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks;
 using PlanetOverview.Services.Interfaces;
 
 namespace PlanetOverview.Controllers;
@@ -17,13 +19,18 @@ public class NewsController : ControllerBase
     [HttpGet("{pais}")]
     public async Task<IActionResult> ObterNoticias(string pais)
     {
-        var result = await _newsService.GetNewsAsync(pais);
-
-        if (result == null)
+        if (string.IsNullOrWhiteSpace(pais))
         {
-            return StatusCode(StatusCodes.Status503ServiceUnavailable, "Não foi possível consultar o serviço de notícias.");
+            return BadRequest("O país é obrigatório.");
         }
 
-        return Ok(result);
+        var resultado = await _newsService.GetNewsAsync(pais);
+
+        if (!resultado.Sucesso)
+        {
+            return StatusCode(503, new { erro = resultado.MensagemErro });
+        }
+
+        return Ok(resultado.Dados);
     }
 }

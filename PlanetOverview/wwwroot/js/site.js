@@ -119,7 +119,16 @@
 
     async function api(path, signal) {
         const response = await fetch(path, { signal, headers: { Accept: 'application/json' } });
-        if (!response.ok) throw new Error(String(response.status));
+        
+        if (!response.ok) {
+            let msgErro = `Erro HTTP: ${response.status}`;
+            try {
+                const errorData = await response.json();
+                if (errorData.erro) msgErro = errorData.erro;
+            } catch { }
+            
+            throw new Error(msgErro);
+        }
         return response.json();
     }
 
@@ -299,45 +308,57 @@
             let unavailable = 0;
             async function card(action, fallback) {
                 try { await action(); }
-                catch { if (!signal.aborted) { unavailable++; fallback(); } }
+                catch (erro) { if (!signal.aborted) { unavailable++; fallback(erro); } }
             }
             await Promise.all([
                 card(async () => {
-                    if (!country.capital) throw new Error('No capital');
+                    if (!country.capital) throw new Error('Sem capital definida');
                     const weather = await api(`/api/weather/${encodeURIComponent(`${country.capital},${country.countryCode}`)}`, signal);
                     if (signal.aborted) return;
                     text('weather', `${Number(weather.temp).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} °C`);
                     text('weather-description', weather.description);
-                }, () => text('weather', '—')),
+                }, (erro) => {
+                    text('weather', '—');
+                    text('weather-description', erro.message); 
+                }),
                 card(async () => {
                     const coordinates = country.capitalCoordinates;
-                    if (!coordinates || coordinates.length < 2) throw new Error('No coordinates');
+                    if (!coordinates || coordinates.length < 2) throw new Error('Sem coordenadas');
                     const time = await api(`/api/time/coordinates?latitude=${coordinates[0]}&longitude=${coordinates[1]}`, signal);
                     if (signal.aborted) return;
+                    
                     const formatter = new Intl.DateTimeFormat('pt-BR', { timeZone: time.timeZone, hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     const initialTime = Date.parse(`${time.localDateTime}Z`);
-                    if (!Number.isFinite(initialTime)) throw new Error('Invalid time');
+                    if (!Number.isFinite(initialTime)) throw new Error('Data/hora inválida');
+                    
                     const started = performance.now();
                     const wallClock = new Intl.DateTimeFormat('pt-BR', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
                     const tick = () => text('local-time', wallClock.format(new Date(initialTime + performance.now() - started)));
                     formatter.format(new Date()); 
                     tick(); clock = setInterval(tick, 1000);
                     text('time-zone', time.timeZone);
-                }, () => text('local-time', '—')),
+                }, (erro) => {
+                    text('local-time', '—');
+                    text('time-zone', erro.message); 
+                }),
                 card(async () => {
-                    if (!country.currencyCode) throw new Error('No currency');
+                    if (!country.currencyCode) throw new Error('Sem código de moeda');
                     const rate = await api(`/api/currency/${encodeURIComponent(country.currencyCode)}`, signal);
                     if (signal.aborted) return;
-                    if (!Number.isFinite(rate.exchangeRate) || rate.exchangeRate <= 0) throw new Error('Invalid rate');
+                    if (!Number.isFinite(rate.exchangeRate) || rate.exchangeRate <= 0) throw new Error('Taxa inválida');
+                    
                     currency = rate.targetCurrency; exchangeRate = rate.exchangeRate;
                     text('currency-rate', `1 ${rate.baseCurrency} = ${exchangeRate.toLocaleString('pt-BR', { maximumFractionDigits: 4 })} ${currency}`);
                     convert();
-                }, () => text('currency-rate', '—')),
+                }, (erro) => {
+                    text('currency-rate', '—');
+                    text('currency-result', erro.message); 
+                }),
                 card(async () => {
                     const news = await api(`/api/news/${encodeURIComponent(country.countryCode)}`, signal);
                     if (!signal.aborted) renderNews(news);
-                }, () => {
-                    newsMessage('Erro', 'As notícias estão indisponíveis.');
+                }, (erro) => {
+                    newsMessage('Erro', erro.message || 'As notícias estão indisponíveis.'); 
                 })
             ]);
             if (signal.aborted) return;
@@ -345,7 +366,8 @@
             text('search-status', '');
         } catch (error) {
             if (signal.aborted) return;
-            text('search-status', 'Erro na consulta.');
+            // Puxa a mensagem do C# ou usa um texto padrão
+            text('search-status', error.message || 'Erro na consulta.');
             text('country-title', 'Nenhum país carregado');
             newsMessage('Erro', 'Não foi possível carregar as informações.');
             text('updated-at', '—');

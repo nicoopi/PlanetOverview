@@ -63,19 +63,38 @@ public sealed class CountryService : ICountryService
         catch (Exception ex) when (ex is HttpRequestException or OperationCanceledException or JsonException or InvalidOperationException) { return null; }
     }
 
-    public async Task<IReadOnlyList<CountrySuggestion>?> GetCountries()
+    public async Task<(bool Sucesso, IReadOnlyList<CountrySuggestion>? Dados, string? MensagemErro)> GetCountries()
     {
         var countries = await LoadCountriesAsync();
-        return countries?.Select(c => new CountrySuggestion(c.CountryName ?? c.Country!, c.Country!, c.CountryCode!)).ToList();
+        
+        if (countries == null || countries.Count == 0)
+        {
+            return (false, null, "Serviço de países temporariamente indisponível. Verifique a conexão ou a chave da API.");
+        }
+
+        var sugestoes = countries.Select(c => new CountrySuggestion(c.CountryName ?? c.Country!, c.Country!, c.CountryCode!)).ToList();
+        return (true, sugestoes, null);
     }
 
-    public async Task<CountryOverview?> GetCountry(string country)
+    public async Task<(bool Sucesso, CountryOverview? Dados, string? MensagemErro)> GetCountry(string country)
     {
-        if (string.IsNullOrWhiteSpace(country)) return null;
+        if (string.IsNullOrWhiteSpace(country)) 
+            return (false, null, "O nome do país não foi informado.");
+
         var countries = await LoadCountriesAsync();
-        if (countries == null) return null;
+        
+        if (countries == null) 
+            return (false, null, "Serviço de países temporariamente indisponível. Verifique a conexão.");
+
         var query = Normalize(country.Trim());
-        return countries.FirstOrDefault(c => new[] { c.CountryName, c.Country, c.CountryCode }.Any(name => name != null && Normalize(name) == query));
+        var encontrado = countries.FirstOrDefault(c => new[] { c.CountryName, c.Country, c.CountryCode }.Any(name => name != null && Normalize(name) == query));
+
+        if (encontrado == null)
+        {
+            return (false, null, $"Não foi possível encontrar o país '{country}'.");
+        }
+
+        return (true, encontrado, null);
     }
 
     private static string? PickCurrency(string? alpha2, IEnumerable<string> codes)
