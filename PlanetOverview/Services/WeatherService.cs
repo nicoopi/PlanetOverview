@@ -53,7 +53,7 @@ public class WeatherService : IWeatherService
         }
         catch (Exception)
         {
-            // Qualquer outro erro bizarro
+            // Qualquer outro erro
             return (false, null, "Ocorreu um erro interno ao buscar as informações do clima.");
         }
 }
