@@ -25,7 +25,7 @@ namespace PlanetOverview.Controllers
                 return BadRequest("O nome da capital é obrigatório.");
             }
 
-            // O retorno agora é uma tupla
+            // O retorno é uma tupla
             var resultado = await _weatherService.GetWeather(capital);
             
             if (!resultado.Sucesso)
